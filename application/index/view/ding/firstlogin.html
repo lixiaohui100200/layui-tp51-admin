@@ -1,0 +1,34 @@
+{extend name="public/base" /}
+{block name="title"}首次登录验证{/block}
+{block name="css"}
+	<link rel="stylesheet" href="__CSS__/ding/firstlogin.css">
+{/block}
+{block name="content"}
+	<div class="scan-apply">
+	    <!-- <img src="__IMAGE__/ding/wjshop.png" alt="" /> -->
+	    <!-- <h3>需先验证您在<b style="color: #0082ff;">微金小店</b>注册的手机号</h3> -->
+	    <form id="loginform">
+	        <label class="phone">
+	            <input type="number" value="" name="phone" placeholder="请输入手机号" pattern="[0-9]" id="listenPhone" data-url="{:url('ding/checkPhone')}"/>
+	        </label>
+	       	<label class="name">
+	            <input type="text" name="name" value="" readonly="readonly" id="username"/>
+	        </label>
+	        <div class="yzm">
+	            <label class="yzm-code">
+	                <input type="number" value="" name="verify" placeholder="验证码" pattern="[0-9]"/>
+	            </label>
+	            <!-- <input  type="button" value="获取验证码" onClick="sendMessage()" class="btn btn-success"/> -->
+	            <button id="btnSendCode" class="btn btn-success" >获取验证码</button>
+	        </div>
+	    </form>
+	    <span class="error-tip"></span>
+	    <button type="button" class="btn btn-success" id="firstlogin" data-url="{:url('markLinkLogin')}">确定</button>
+	    <p class="btn btn-cancel" >取消</p>
+	</div>
+{/block}
+{block name="footjs"}
+	<!-- <script src="__PUBLIC__/lib/layer/mobile/layer.js" type="text/javascript" charset="utf-8"></script> -->
+	<!-- <script src="__JS__/ding/yzm.js" type="text/javascript" charset="utf-8"></script> -->
+	<script src="__JS__/ding/firstlogin.js" type="text/javascript" charset="utf-8"></script>
+{/block}

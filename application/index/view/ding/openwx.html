@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>跳转提示</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+</head>
+<body>
+<style type="text/css">
+	img{
+		display: block;width:30%;margin:0 auto;margin-top:30%;
+	}
+</style>
+<div>
+	<img src="__IMAGE__/public/echotips/laugh.png" >
+	{if $redirect == 'ali'} 
+	<p style="color:#000;font-size: 16px;margin-top:5%;text-align: center;">安卓用户请点击右上角，用手机浏览器打开</p>
+	{else /}
+	<p style="color:#000;font-size: 16px;margin-top:5%;text-align: center;" data-url="{$redirect}">正在跳转</p>
+	{/if}
+</div>
+<script type="text/javascript" src="__JS__/public/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+	if(typeof $('p').data('url') != 'undefined'){
+		window.location.href = $('p').data('url');
+	}
+</script>
+</body>
+</html>

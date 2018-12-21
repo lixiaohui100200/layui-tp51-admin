@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>服务台</title>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+</head>
+<body>
+<style type="text/css">
+	img{
+		display: block;width:30%;margin:0 auto;margin-top:30%;
+	}
+</style>
+<div>
+	{switch $type }
+	{case success }<img src="__IMAGE__/public/echotips/laugh.png" >{/case}
+	{case little}<img src="__IMAGE__/public/echotips/chagrin.png" >{/case}
+	{case pride}<img src="__IMAGE__/public/echotips/pride.png" >{/case}
+	{case surprised}<img src="__IMAGE__/public/echotips/surprised.png" >{/case}
+	{case error}<img src="__IMAGE__/public/echotips/cry.png" >{/case}
+	{default /}
+	{/switch}
+	<p style="color:#000;font-size: 16px;margin-top:5%;text-align: center;">{$code|default="404，可怜的未知错误！"}</p>
+</div>
+</body>
+</html>

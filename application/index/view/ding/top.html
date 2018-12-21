@@ -1,0 +1,51 @@
+{extend name="public/base" /}
+{block name="title"}积分TOP8{/block}
+{block name="css"}
+	<link rel="stylesheet" type="text/css" href="__CSS__/ding/top.css">
+{/block}
+{block name="headjs"}
+	<script type="text/javascript">
+		function imgerror(obj) {
+			var str = $(obj).attr('alt')
+			$(obj).after('<p>'+str+'</p>');
+			$(obj).remove();
+		}
+	</script>
+{/block}
+{block name="content"}
+	<div class="head">
+		<!-- 积分排行榜 -->
+	</div>
+	<div class="content">
+		<ol class="c-head">
+			<li>
+				<h2>{$user.rownum|default=0}</h1>
+				<h5>我的排名</h5>
+			</li>
+			<li>
+				<div><img src="{$user.headimgurl}" alt="{$user.name|mb_substr=-2}" onerror="imgerror(this)"></div>
+				<h5>{$user.name}</h5>
+			</li>
+			<li>
+				<h2>{$user.remain_points|default=0}</h1>
+				<a>查看积分明细</a>
+			</li>
+		</ol>
+		<ul class="c-detail">
+			{volist name="top8" id="vo"}
+			<li {eq name="user.open_id" value="$vo.open_id" }class="active"{/eq}>
+				{if $key < 3}
+				<div></div>
+				{else/}
+				<div>{$key+1}</div>
+				{/if}
+				<img class="left" src="{$vo.headimgurl}" alt="{$vo.name|mb_substr=-2}" onerror="imgerror(this)">
+				<h5>{$vo.name}</h5>
+				<em class="right"></em>
+				<span class="right">{$vo.remain_points}</span>
+			</li>
+			{/volist}
+		</ul>
+	</div>
+	<h6 class="foot">质链课外小组提供技术支持</h6>
+{/block}
