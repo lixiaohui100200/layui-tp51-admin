@@ -36,6 +36,7 @@ return [
         '__STATIC__' => '/static',
         '__IMAGE__' => '/static/images',
         '__JS__' => '/static/js',
-        '__CSS__' => '/static/css'
+        '__CSS__' => '/static/css',
+        '__THIRD__' => '/static/third'
     ]
 ];

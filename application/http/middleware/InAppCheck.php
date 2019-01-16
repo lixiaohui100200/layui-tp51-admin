@@ -53,7 +53,8 @@ class InAppCheck
 
             $ding_redirect = "https://oapi.dingtalk.com/connect/oauth2/sns_authorize?".http_build_query($query);
             
-            header('location:'.$ding_redirect);  
+            header('location:'.$ding_redirect);
+            exit(); //执行跳转后进行业务隔离阻断，防止程序继续执行
         }
     }
 }

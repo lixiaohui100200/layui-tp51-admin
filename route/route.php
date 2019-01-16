@@ -9,10 +9,18 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-Route::get('think', function () {
-    return 'hello,ThinkPHP5!';
+Route::get('redirect', 'index/redirectLast');
+Route::get('open/wx/weijin', 'ding/openWeijinShop');
+
+Route::group('wj', function(){
+	Route::group(['method' => 'get'], [
+		'depoints/top' => 'ding/topping',
+		'wx/firstlogin' => 'ding/wxUserFirstLogin',
+	]);
 });
 
-Route::get('open/wx/weijin', 'ding/openWeijinShop');
-Route::get('wj/depoints/top', 'ding/topping');
-Route::get('wj/wx/firstlogin', 'ding/wxUserFirstLogin');
+Route::group('do', function(){
+	Route::group(['method' => 'post'], [
+		'sendmsg' => 'through/sendMsgCode'
+	]);
+});

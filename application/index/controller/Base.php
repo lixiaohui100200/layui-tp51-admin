@@ -2,6 +2,7 @@
 namespace app\index\controller;
 use think\Controller;
 use Session;
+use util\Redis;
 use Db;
 
 class Base extends Controller
@@ -15,11 +16,16 @@ class Base extends Controller
 	{
 		$this->dingName = Session::get('ding.nick');
 		$this->dingOpenid = Session::get('ding.openid');
-		if($this->dingOpenid){
-			//由于数据库user没有关联性,直接使用名称查询一条,若重名需重新思考方法
-			$user = Db::query("SELECT open_id,name,phone FROM extra_source_user WHERE name LIKE :uname AND unid = :unid LIMIT 1", ['uname' => '%'.$this->dingName.'%', 'unid' => $this->unid]);
+		$this->userPhone = Redis::hGet('wj_user_ding', 'openid'.$this->dingOpenid);
 
-			Session::set('user.wx_openid', $this->wx_openid = $user[0]['open_id']);
+		if(Session::has('user.wx_openid')){
+			$this->wx_openid = Session::get('user.wx_openid');
+		}else{
+			if($this->dingOpenid && $this->userPhone){
+				$user = Db::query("SELECT open_id,name,phone FROM extra_source_user WHERE phone = :phone AND unid = :unid LIMIT 1", ['phone' => $this->userPhone, 'unid' => $this->unid]);
+
+				Session::set('user.wx_openid', $this->wx_openid = $user[0]['open_id']);
+			}
 		}
 	}
 
