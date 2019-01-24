@@ -7,7 +7,6 @@ class Index
 {
     public function index()
     {
-        echo "string";
     	echo "ok index";
     }
 
