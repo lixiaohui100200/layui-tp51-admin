@@ -30,7 +30,7 @@ class Through
     	$alisms = AliSms::sendSms($data, ['code' => $msg]);
 
     	if($alisms->Code == "OK"){
-    		Redis::set('loginCode_'.Session::get('ding.openid'), $msg, 290);
+    		Redis::set('loginCode_'.$phone, $msg, 290);
     		exit($this->res_json('100', $alisms->Code));
     	}
 

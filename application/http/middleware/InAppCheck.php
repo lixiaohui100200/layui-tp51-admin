@@ -3,6 +3,7 @@ namespace app\http\middleware;
 use util\Redis;
 use Env;
 use Session;
+use EasyWeChat\Factory;
 
 class InAppCheck
 {
@@ -10,6 +11,9 @@ class InAppCheck
     {
     	if (preg_match('~micromessenger~i', $request->header('user-agent'))) {
             $request->InApp = 'WeChat';
+            if(!Session::has('wechat.original.openid')){
+                $this->wechat($request);
+            }
         } else if (preg_match('~alipay~i', $request->header('user-agent'))) {
             $request->InApp = 'Alipay';
         } else if (preg_match('~dingtalk~i', $request->header('user-agent'))) {
@@ -22,6 +26,28 @@ class InAppCheck
         }
         
     	return $next($request);
+    }
+
+    public function wechat($request)
+    {
+        $config = [
+            'app_id' => config('wechat.official_account')['default']['app_id'],
+        ];
+        
+        if($request->get('code')){
+            $config['secret'] = config('wechat.official_account')['default']['secret'];
+            $app = Factory::officialAccount($config);
+            $user = $app->oauth->user();
+            Session::set('wechat', $user);
+        }else{
+            $config['oauth'] = [
+                'scopes'   => ['snsapi_userinfo'],
+                'callback' => $this->getTargetUrl($request),
+            ];
+            $app = Factory::officialAccount($config);
+            header("location: ". $app->oauth->redirect()->getTargetUrl());
+            exit(); //执行跳转后进行业务隔离阻断，防止程序继续执行
+        }
     }
 
     public function dingtalk($request)
@@ -39,7 +65,7 @@ class InAppCheck
                 return view('public/tips', ['type' => 'pride', 'code' => '请不要非法入侵']);
             }
         }else{
-            $redirect_uri = HTTP_FRONT.'://'.DOMAIN_NAME.$request->server('REQUEST_URI');
+            $redirect_uri = http_scheme().'://'.$request->server('SERVER_NAME').$request->server('REQUEST_URI');
             $state = rand(100, 999).'1';
             Redis::set('ding_state', $state, 30);
 
@@ -56,5 +82,17 @@ class InAppCheck
             header('location:'.$ding_redirect);
             exit(); //执行跳转后进行业务隔离阻断，防止程序继续执行
         }
+    }
+
+    protected function getTargetUrl($request)
+    {
+        $param = $request->get();
+        if (isset($param['code'])) {
+            unset($param['code']);
+        }
+        if (isset($param['state'])) {
+            unset($param['state']);
+        }
+        return $request->baseUrl() . (empty($param) ? '' : '?' . http_build_query($param));
     }
 }

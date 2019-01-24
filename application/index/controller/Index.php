@@ -10,32 +10,10 @@ class Index
     	echo "ok index";
     }
 
-     public function hello()
-    {
-        $name = session('name');
-        return 'hello,' . $name . '! <br/><a href="/index/index/restore">点击回到来源地址</a>';
-    }
-
-    public function restore()
-    {
-        // 设置session标记完成
-        session('complete', true);
-        // 跳回之前的来源地址
-        return redirect()->restore();
-    }
-
     public function getr()
     {
         //dump(Redis::hDel('wj_user_ding', 'openidYiPoCnMJWk19Dork4r4KcagiEiE'));
         dump(Redis::hGetall('wj_user_ding'));
-    }
-
-    public function my()
-    {
-        $my = session('ding.openid');
-        $phone = Redis::hGet('wj_user_ding', 'openid'.$my);
-        // echo "<h1>$my</h1>";
-        echo "<h1>$phone</h1>";
     }
 
     /**

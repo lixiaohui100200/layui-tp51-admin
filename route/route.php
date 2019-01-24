@@ -16,6 +16,10 @@ Route::group('wj', function(){
 	Route::group(['method' => 'get'], [
 		'depoints/top' => 'ding/topping',
 		'wx/firstlogin' => 'ding/wxUserFirstLogin',
+		'' => 'wjutil/index/index',
+		'login/auto' => 'wjutil/login/autologin',
+		'meeting/sign' => 'wjutil/meeting/signIn',
+		'lucky' => 'wjutil/meeting/luckyDraw'
 	]);
 });
 

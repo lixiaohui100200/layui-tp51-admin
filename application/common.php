@@ -29,7 +29,8 @@ function i_dump($param)
 /**
  * @author lishuaiqiu
  */
-function i_base64encode($string) {
+function i_base64encode($string) 
+{
     $base64 = base64_encode($string);
     $data = str_replace(array('+','/','='),array('-','_',''),$base64);
     return $data;
@@ -38,7 +39,8 @@ function i_base64encode($string) {
 /**
  * @author lishuaiqiu
  */
-function i_base64decode($string) {
+function i_base64decode($string) 
+{
     $data = str_replace(array('-','_'),array('+','/'),$string);
     $mod4 = strlen($data) % 4;
     if ($mod4) {
@@ -73,7 +75,8 @@ function i_log($output, $filename = '', $suffix = ".log")
  * @author lishuaiqiu
  * @return 返回http或者https
  */
-function http_front() {
+function http_scheme() 
+{
     if ( !empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on') {
         return 'https';
     } elseif ( isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
@@ -89,7 +92,8 @@ function http_front() {
  * @param $url
  * @return bool|mixed
  */
-function httpGet($url){
+function httpGet($url)
+{
     $oCurl = curl_init();
     if (stripos($url, "https://") !== false) {
         curl_setopt($oCurl, CURLOPT_SSL_VERIFYPEER, false);

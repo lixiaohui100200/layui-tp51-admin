@@ -1,0 +1,112 @@
+{extend name="public/base" /}
+{block name="title"}2019耘和&微金年会会抽奖现场{/block}
+{block name="css"}
+<link rel="stylesheet" href="__CSS__/wjutil/luckydraw.css" />
+{/block}
+{block name="content"}
+	<div class="main-box">
+
+	<div class="title-box">
+	<img src="__IMAGE__/wjutil/meeting/pc-titile.png" alt="" />
+	</div>
+
+	<div class="desc-box">
+	<img src="__IMAGE__/wjutil/meeting/dianzhui.png" alt="" />
+	</div>
+	<div class="main">
+
+	<div class="num-bg-box">
+
+	<div class="num_box">
+	<div class="num"></div>
+	<div class="num"></div>
+	<div class="num"></div>
+	<div class="num"></div>
+	<div class="num"></div>
+	<div class="num"></div>
+	<div class="num"></div>
+	<div class="num"></div>
+	<div class="num"></div>
+	<div class="num"></div>
+	<div class="num"></div>
+	</div>
+	</div>
+	</div>
+	</div>
+	<div class="btn-box">
+	<div class="btn start" data-url="{:url('numPool')}">开始抽奖</div>
+	<div class="btn stop">停止抽奖</div>
+	</div>
+{/block}
+{block name="footjs"}
+	<script type="text/javascript" src="__JS__/wjutil/easing.js"></script>
+	<script>
+	    var u = 100;
+	    var n = 1;
+	    var timer; //定义滚动的定时器
+	    var result   = 13888888888; //指定中奖结果,可以抽取指定数组中的某一个
+	    var isBegin  = false; //标识能否开始抽奖
+
+	    $(".num").css('backgroundPositionY',200);//开始13888888888
+	    $(".num").eq(0).css('backgroundPositionY',-100)
+	    $(".num").eq(1).css('backgroundPositionY',-300)
+
+	    //执行数字滚动
+	    function run(){
+	        n++;
+	        $(".num").each(function(index){
+	            var _num = $(this);
+	            _num.animate({
+	                backgroundPositionY: ((u+1)*n*(index+1))
+	            },100);
+
+	        });
+	        timer = window.setTimeout(run,100);
+	        isBegin = true ;
+	    }
+	    $(function(){
+	        //开始抽奖
+	        $('.start').click(function(){
+	            if(isBegin){
+	                return false;
+	            }else{
+	            	run();
+	            	$.post($(this).data('url'),{},function(res){
+	            		// console.log(res)
+	            		res = $.parseJSON(res);
+						if(res.code == 100){
+							result = res.result
+						}else{
+							result = 18888888888
+						}
+	            	});
+	            }
+	        });
+
+	        //停止抽奖
+	        $('.stop').click(function(){
+
+	            var num_arr = (result+'').split('');
+
+	            $(".num").each(function(index){
+	                var _num = $(this);
+	                setTimeout(function(){
+	                    _num.animate({
+	                        backgroundPositionY: (u*60) - (u*num_arr[index])
+	                    },{
+	                        duration: 500,
+	                        easing: "easeInOutCirc",
+	                        complete: function(){
+	                            if(index == 10){
+	                                isBegin = false;
+	                            }
+	                        }
+	                    });
+	                },100);
+	            });
+	            window.clearTimeout(timer);
+	            isBegin = false ;
+	        });
+	    });
+	</script>
+{/block}
