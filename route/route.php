@@ -19,7 +19,10 @@ Route::group('wj', function(){
 		'' => 'wjutil/index/index',
 		'login/auto' => 'wjutil/login/autologin',
 		'meeting/sign' => 'wjutil/meeting/signIn',
-		'lucky' => 'wjutil/meeting/luckyDraw'
+		'lucky' => 'wjutil/meeting/luckyDraw',
+
+		'now' => 'wjutil/index/now',
+		'users' => 'wjutil/index/allyusers',
 	]);
 });
 

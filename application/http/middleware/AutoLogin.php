@@ -15,7 +15,7 @@ class AutoLogin
         'wjutil/Login',
         'wj/lucky',
         'wjutil/Meeting/numPool',
-        'wjutil/index/index'
+        'wjutil/index'
     ];
 
     public function handle($request, \Closure $next, $name)
@@ -78,11 +78,11 @@ class AutoLogin
                 return true;
             }
         }else if(count($patternArr) == 2){
-            if($patternArr[0] == $request->module() && $patternArr[1] == $request->controller()){
+            if(strtolower($patternArr[0]) == strtolower($request->module()) && strtolower($patternArr[1]) == strtolower($request->controller())){
                 return true;
             }
         }else{
-            if($patternArr[0] == $request->module()){
+            if(strtolower($patternArr[0]) == strtolower($request->module())){
                 return true;
             }
         }
