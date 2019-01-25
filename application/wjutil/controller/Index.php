@@ -5,15 +5,7 @@ class Index
 {
     public function index()
     {
-    	dump(\util\Redis::get('lucky'));
-    	dump(\util\Redis::set('lucky', ''));
-		dump(\util\Redis::get('lucky'));
         return 'weijin util集合';
-    }
-
-    public function now()
-    {
-    	dump(\util\Redis::get('lucky'));
     }
 
     public function allyusers()

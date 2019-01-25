@@ -50,12 +50,8 @@ class Meeting extends Base
 
     public function numPool()
     {
-        i_log('抽奖开始...');
-        $result = $this->inlucky();
-        $result = Db::table('extra_source_meeting_sign')->field('sign_num')->where('sign_num', 'NOT IN', '13776052628,15956002040,18662538931')->where('is_join_lucky', '<>', 1)->select();
+        $result = Db::table('extra_source_meeting_sign')->field('sign_num')->where('is_join_lucky', '<>', 1)->select();
 
-        !$result && i_log('抽奖池已空！(或错误)');
-        !$result && i_log('=======================================');
         !$result && exit($this->res_json('102', '数据获取失败'));
 
         $sum = count($result);
@@ -65,9 +61,7 @@ class Meeting extends Base
         if($final > 0){
             Db::name('extra_source_meeting_sign')->where('sign_num', $final)->update(['is_join_lucky' => 1]);
         }
-
-        i_log('抽奖结束！中奖号码：'.$final);
-        i_log('=======================================');
+        
         exit($this->res_json('100', $final));
     }
 }

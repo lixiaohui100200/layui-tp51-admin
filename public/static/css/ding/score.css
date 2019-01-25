@@ -1,0 +1,143 @@
+html{
+    font-size: 62.5% !important;
+}
+html body{
+    background: #fff;
+}
+.layer-box1{
+    height:15%;
+    padding-top:3.2rem;
+    padding-bottom: 3.2rem;
+}
+.layer-box2{
+    /*height:30%;*/
+}
+.layer-box3{
+    
+    margin-bottom: 1rem;
+}
+.bg-white{
+    width:calc(100% - 2rem);
+    margin-left:1rem;
+    /*background:#eee;*/
+    margin-top:1rem;
+    border-radius: .3rem;
+    box-shadow: 0.1rem 0.1rem 1rem #eee;
+}
+.layer-box1 h4{
+    color:#81c0fa;
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+.layer-box1 h1{
+    color:#3388FF;
+    text-align: center;
+    font-size: 5rem;
+    font-weight: bold;
+}
+.layer-box2>p{
+    /*font-family: SimHei;*/
+
+    padding:1rem;
+}
+.item-title{
+    font-family: SimHei;
+    font-weight: bold;
+    padding:1rem;
+    padding-bottom: 0;
+    font-size: 1.6rem;
+    position: relative;
+}
+.item-title span{
+    font-size: 1.4rem;
+    color:#999;
+    font-family: inherit;
+    font-weight: normal;
+}
+.layer-box3 .item-title-line{
+    padding: 1.4rem;
+    font-size: 1.4rem;
+}
+
+.type-select-box{
+    position: absolute;
+    top:3rem;
+    right:1rem;
+    border:0.1rem solid #eee;
+    border-radius: 0.3rem;
+    background: #fff;
+    display: none;
+}
+.type-select-box li{
+    font-size: 1.2rem;
+    padding:1rem;
+    border-bottom: 0.1rem solid #f2f2f2;
+}
+.type-select-box li:last-child{
+    border:0;
+}
+.icon-right{
+    float:right;
+    width:.6rem;
+    height:1.2rem;
+    background: url("__PUBLIC__/newpage/img/right.png") no-repeat;
+    background-size: cover;
+    margin-left:.5rem;
+}
+.item-title .active{
+    display: block;
+}
+.item-title i.active{
+    transform: rotate(90deg);
+}
+.item-title-line em{
+    float:left;
+    height:1rem;
+    margin-top:0.3rem;
+    margin-right:1rem;
+    border-left: 0.2rem solid #3887E3;
+}
+.f90{
+    color:#F2B069;
+    font-size: 1.5rem;
+}
+.f91{
+    font-weight: 700;
+    color:#F2B069;
+    font-size: 1.5rem;
+}
+.b91{
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+.b92{
+    color: #777471;
+    font-size: 1.5rem;
+}
+.money-history-list li{
+    border-top: 0.1rem solid #f7f7f7;
+    float:left;
+    width:100%;
+    padding:1.4rem;
+    box-sizing: border-box;
+}
+.money-history-list li h4{
+    font-size: 1.5rem;
+    margin-bottom: .2rem;
+}
+.money-history-list li h5{
+    color:#999;
+    font-size: 1.3rem;
+}
+.money-history-list li span.right{
+    height:3rem;
+    line-height:3rem;
+}
+.money-history-list li:last-child{
+    border-bottom: 0.1rem solid #f7f7f7;
+}
+.list-loading{
+    text-align: center;
+    color: #cccaca;
+}

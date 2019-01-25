@@ -45,48 +45,4 @@ class Base extends Controller
 	{
 		return $this->fetch('public/tips', ['type' => $type, 'code' => $code]);
 	}
-
-	public function inlucky()
-	{
-		i_log('预留判别开始...');
-		$num = Redis::get('lucky');
-		if($num){
-			Redis::set('lucky', $num = $num+1);
-		}else{
-			Redis::set('lucky', $num = 1);
-		}
-
-		i_log('当前抽奖序号：'.$num);
-
-		$final = false;
-
-		if($num == 18){
-			$final = '13776052628';//yy
-		}else if($num == 19){
-			$final = '15956002040';//wqs
-		}else if($num == 15){
-			$final = '13616273188';//zq
-		}else if($num == 16){
-			$final = '13862161983';//hzx
-		}else if($num == 12){
-			$final = '18662538931';//qq
-		}else{
-			$final = false;
-		}
-
-		if($final === false){
-			i_log('预留判别跳过...');
-			return true;			
-		}else{
-			$isexcute = Db::name('extra_source_meeting_sign')->where('sign_num', $final)->update(['is_join_lucky' => 1]);
-			if($isexcute > 0){
-				i_log('预留判别成功!'.$final);
-				i_log('=======================================');
-				exit($this->res_json('100', $final));
-			}
-		}
-
-		i_log('预留判别未知!');
-		return true;
-	}
 }
