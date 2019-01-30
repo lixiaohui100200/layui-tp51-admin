@@ -7,6 +7,9 @@ class Index
 {
     public function index()
     {
+        session('wechat.original', ['city' => 44]);
+
+        dump(session('wechat')['original']['city'] ? '|'.session('wechat')['original']['city']: '');
     	echo "ok index";
     }
 

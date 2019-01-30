@@ -43,7 +43,7 @@ class Login extends Controller
             'remain_points' => 0,
             'company' => '耘和',
             'red_money' => 0,
-            'position' => session('wechat')['original']['country'].(session('wechat')['original']['province'] ?: '|'.session('wechat')['original']['province']).( session('wechat')['original']['city'] ?: '|'.session('wechat')['original']['city']),
+            'position' => session('wechat')['original']['country'].(session('wechat')['original']['province'] ? '|'.session('wechat')['original']['province'] : '').( session('wechat')['original']['city'] ? '|'.session('wechat')['original']['city'] : ''),
             'unid' => 78,
             'ding_open_id' => session('ding.openid'),
         ];
