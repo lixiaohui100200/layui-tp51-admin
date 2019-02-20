@@ -36,7 +36,13 @@ composer install
 composer dump-autoload
 ~~~
 
-4.更新Thinkphp框架（如果需要）
+4.配置环境变量文件
+
+~~~
+cp .env.example .env
+~~~
+
+5.更新Thinkphp框架（如果需要）
 
 ~~~
 composer update topthink/framework
