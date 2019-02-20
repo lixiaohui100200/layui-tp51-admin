@@ -24,7 +24,18 @@
 git clone xx.com/asuma-tp51-beta my-project(项目名称自定义)
 ~~~
 
-本框架不支持composer安装，但可用composer更新thinkphp框架
+本框架不支持composer安装，但必须使用Composer安装依赖库
+
+~~~
+composer install
+~~~
+
+同时需要加载手动引入的第三方类库
+~~~
+composer dump-autoload
+~~~
+
+更新Thinkphp框架（如果需要）
 
 ~~~
 composer update topthink/framework
