@@ -1,4 +1,4 @@
 *
 !.gitignore
-!aliyunsms/
-!taobao/
+!aliyunsms/*
+!taobao/*
