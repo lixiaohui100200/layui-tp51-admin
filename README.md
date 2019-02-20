@@ -6,7 +6,7 @@
 
  + php5.6以上。推荐使用`php7.1`
  + Mysql5.5以上。推荐使用`mysql5.7`
- + 使用本框架需安装PHPredis扩展
+ + 安装php-redis扩展
 
 新增的功能：
 
