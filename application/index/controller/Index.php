@@ -7,16 +7,7 @@ class Index
 {
     public function index()
     {
-        session('wechat.original', ['city' => 44]);
-
-        dump(session('wechat')['original']['city'] ? '|'.session('wechat')['original']['city']: '');
     	echo "ok index";
-    }
-
-    public function getr()
-    {
-        //dump(Redis::hDel('wj_user_ding', 'openidYiPoCnMJWk19Dork4r4KcagiEiE'));
-        dump(Redis::hGetall('wj_user_ding'));
     }
 
     /**
@@ -29,6 +20,9 @@ class Index
         return redirect()->restore($rd_url);
     }
 
+    /**
+    * 默认页渲染模板
+    */
     public function defaultIndex()
     {
         return view('public/tips', ['type' => 'success', 'code' => '登录成功，请退出本页面']);

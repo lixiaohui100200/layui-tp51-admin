@@ -66,7 +66,13 @@ function i_log($output, $filename = '', $suffix = ".log")
     
     $head_str = '['.date('H:i:s').'] '.think\facade\Request::module().'/'.think\facade\Request::controller().'/'.think\facade\Request::action().' '.ucfirst(gettype($output))."\r\n";
 
-    !is_string($output) && $output = var_export($output, true);
+    if(!is_string($output)){
+        try {
+            $output = var_export($output, true);
+        } catch (\Exception $e) {
+            $output = print_r($output, true);
+        }
+    };
 
     file_put_contents($logUrl.$filename.$suffix , $head_str.$output."\r\n" ,FILE_APPEND);
 }
@@ -122,4 +128,27 @@ function checkPhone($mobile)
         return false;
     }
     return preg_match('#^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[\d]{9}$|^18[\d]{9}$#', $mobile) ? true : false;
+}
+
+/**
+ * @author lishuaiqiu
+ * 检查座机号码
+ */
+function checkLandline($landline){
+    $phoneNum = preg_match('/^((\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$/', $landline);
+
+    return $phoneNum ? true : false;
+}
+
+/**
+ * @author lishuaiqiu
+ * 生成随机字符串
+ */
+function randStr($length)
+{
+    $chars = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for ($i = 0; $i < $length; $i++) {
+        $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
+    }
+    return $str;
 }

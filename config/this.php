@@ -11,6 +11,10 @@ return [
     'REDIS_PORT' => 6379, // redis端口号
     'REDIS_PREFIX' => Env::get('REDIS_PREFIX', ''), //redis 项目统一的key前缀
 
+    //钉钉相关配置
+    'ding_appid' => 'dingoaxxse4aif7wknuwhx',
+	'ding_appsecret' => 'F7HKpNUJZeyRyiNShX7itWLtNO8xLO-uSZj7x0648wBPgK_GVM-Tt6Sg9tbsR-Pf',
+
     //阿里云短信服务
     'alisms_key' => 'LTAIDl8gVgPhtUMX',
     'alisms_secret' => 'tbBKqgOqabMXNZeCZh1bDJPbqoaYXO',

@@ -1,7 +1,6 @@
 <?php
 namespace app\index\controller;
 use Config;
-use Session;
 use think\Request;
 use util\Redis;
 use this\AliSms;

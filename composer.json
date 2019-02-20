@@ -23,7 +23,7 @@
     "autoload": {
         "classmap":[
             "vendor/taobao",
-            "vendor/alidysm"
+            "vendor/aliyunsms"
         ],
         "psr-4": {
             "app\\": "application"

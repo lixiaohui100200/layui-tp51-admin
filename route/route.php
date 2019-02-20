@@ -9,23 +9,10 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-Route::get('redirect', 'index/redirectLast');
-Route::get('open/wx/weijin', 'ding/openWeijinShop');
-
-Route::group('wj', function(){
-	Route::group(['method' => 'get'], [
-		'depoints/top' => 'ding/topping',
-		'wx/firstlogin' => 'ding/wxUserFirstLogin',
-		'' => 'wjutil/index/index',
-		'login/auto' => 'wjutil/login/autologin',
-		'meeting/sign' => 'wjutil/meeting/signIn',
-		'lucky' => 'wjutil/meeting/luckyDraw',
-		'users' => 'wjutil/index/allyusers',
-	]);
-});
+Route::get('redirect', 'index/redirectLast'); //记住的跳转地址
 
 Route::group('do', function(){
 	Route::group(['method' => 'post'], [
-		'sendmsg' => 'through/sendMsgCode'
+		'sendmsg' => 'through/sendMsgCode' //发送验证码
 	]);
 });

@@ -7,26 +7,14 @@ use Db;
 
 class Base extends Controller
 {
-	protected $dingName = "";
 	protected $dingOpenid = "";
-	protected $unid = 91;
 	protected $wx_openid = "";
 
 	public function initialize()
 	{
-		$this->dingName = Session::get('ding.nick');
 		$this->dingOpenid = Session::get('ding.openid');
-		$this->userPhone = Redis::hGet('wj_user_ding', 'openid'.$this->dingOpenid);
-
-		if(Session::has('user.wx_openid')){
-			$this->wx_openid = Session::get('user.wx_openid');
-		}else{
-			if($this->dingOpenid && $this->userPhone){
-				$user = Db::query("SELECT open_id,name,phone FROM extra_source_user WHERE phone = :phone AND unid = :unid LIMIT 1", ['phone' => $this->userPhone, 'unid' => $this->unid]);
-
-				Session::set('user.wx_openid', $this->wx_openid = $user[0]['open_id']);
-			}
-		}
+		$this->userPhone = "";
+		$this->wx_openid = "";
 	}
 
 	/**

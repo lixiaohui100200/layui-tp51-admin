@@ -1,21 +1,30 @@
 <?php
+// +----------------------------------------------------------------------
+// | 自动注册登录中间件
+// +----------------------------------------------------------------------
+// | Author: asuma(lishuaiqiu) <sqiu_li@163.com>
+// +----------------------------------------------------------------------
+
 namespace app\http\middleware;
 use Session;
 use Url;
-use Db;
 
 class AutoLogin
 {
     /**
+     * 跳转地址，支持符合规则的路由或模块/控制器/方法
+     *
+     */
+    protected $redirect_url = 'login';  // 必设项，检测到未登录的跳转地址
+
+    /**
+     * 排除的验证地址
      * 支持完整的路由规则，或者模块/控制器/方法。若需要精确到方法，请使用完整的路由地址（模块/控制器/方法）
      *
      * @var array
      */
     protected $except = [
-        'wjutil/Login',
-        'wj/lucky',
-        'wjutil/Meeting/numPool',
-        'wjutil/index'
+        //'Login',
     ];
 
     public function handle($request, \Closure $next, $name)
@@ -24,29 +33,21 @@ class AutoLogin
             return $next($request);
         }
 
-    	$userphone = Session::get('user.userphone');
+    	//$userphone = Session::get('user.userphone');
     	if(!$userphone){
-    		$where = "";
-    		if($request->InApp == 'WeChat'){
-    			$where = ['open_id' => Session::get('wechat')['original']['openid']];
-    		}else if($request->InApp == 'DingTalk'){
-    			$where = ['ding_open_id' => Session::get('ding.openid')];
-    		}else{
-    			$where = ['id' => 0];
-    		}
+    		
+            //登录业务逻辑
+            // .....
 
-            $user = Db::table('extra_source_user')->field('id,phone,name')->where('unid', 'IN' , '78,91')->where($where)->find();
-            
             if($user){
-                Session::set('user.userphone', $user['phone']);
-                Session::set('user.name', $user['name']);
-                Session::set('user.id', $user['id']);
+                //示例
+                //Session::set('user.id', $user['id']);
             }else{
                 if($request->isAjax()){
                     header('Ajax-Mark: redirect');
-                    header("Redirect-Path: ".Url::build('wjutil/login/autologin'));
+                    header("Redirect-Path: ".Url::build($this->redirect_url));
                 }else{
-                    return redirect('wjutil/login/autologin')->remember();
+                    return redirect($this->redirect_url)->remember();
                 }
                 exit(); //执行跳转后进行业务隔离阻断，防止程序继续执行
             }

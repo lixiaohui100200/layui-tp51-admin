@@ -1,7 +1,12 @@
 <?php
+// +----------------------------------------------------------------------
+// | App检测并且自动获取授权 中间件
+// +----------------------------------------------------------------------
+// | Author: asuma(lishuaiqiu) <sqiu_li@163.com>
+// +----------------------------------------------------------------------
+
 namespace app\http\middleware;
 use util\Redis;
-use Env;
 use Session;
 use EasyWeChat\Factory;
 
@@ -38,10 +43,11 @@ class InAppCheck
             $config['secret'] = config('wechat.official_account')['default']['secret'];
             $app = Factory::officialAccount($config);
             $user = $app->oauth->user();
-            Session::set('wechat', $user);
+            Session::set('wechat.openid', $user['id']);
+            Session::set('wechat.userinfo', $user['original']);
         }else{
             $config['oauth'] = [
-                'scopes'   => ['snsapi_userinfo'],
+                'scopes'   => ['snsapi_userinfo'], //snsapi_base  or snsapi_userinfo
                 'callback' => $this->getTargetUrl($request),
             ];
             $app = Factory::officialAccount($config);
@@ -57,7 +63,7 @@ class InAppCheck
                 $c = new \DingTalkClient(\DingTalkConstant::$CALL_TYPE_OAPI, \DingTalkConstant::$METHOD_POST, \DingTalkConstant::$FORMAT_JSON);
                 $req = new \OapiSnsGetuserinfoBycodeRequest;
                 $req->setTmpAuthCode($request->get('code'));
-                $resp=$c->executeWithAccessKey($req, "https://oapi.dingtalk.com/sns/getuserinfo_bycode", Env::get('DING_APPID'), Env::get('DING_APPSECRET'));
+                $resp=$c->executeWithAccessKey($req, "https://oapi.dingtalk.com/sns/getuserinfo_bycode", config('this.ding_appid'), config('this.ding_appsecret'));
 
                 Session::set('ding.openid', $resp->user_info->openid);
                 Session::set('ding.nick', $resp->user_info->nick);
@@ -70,7 +76,7 @@ class InAppCheck
             Redis::set('ding_state', $state, 30);
 
             $query = array(
-                'appid' => Env::get('DING_APPID'),
+                'appid' => config('this.ding_appid'),
                 'response_type' => 'code',
                 'scope' => 'snsapi_auth',
                 'state' => $state,

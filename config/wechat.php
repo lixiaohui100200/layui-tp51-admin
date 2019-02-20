@@ -57,7 +57,7 @@ return [
         ],
     ],
 
-    //第三方开发平台
+    //开放平台
     //'open_platform'    => [
     //    'default' => [
     //        'app_id'  => env('WECHAT_OPEN_PLATFORM_APPID', ''),
