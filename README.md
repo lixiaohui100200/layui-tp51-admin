@@ -16,26 +16,26 @@
  + 集成阿里短信SDK
  + 集成微信开发SDK -- EasyWeChat
 
-## 安装
+## 安装步骤
 
-使用git安装
+1.使用git安装
 
 ~~~
 git clone http://gitlab.weijin365.com/lisq/asuma-tp51-beta.git my-project(项目名称自定义)
 ~~~
 
-本框架不支持composer安装，但必须使用Composer安装依赖库
+2.本框架不支持composer安装，但必须使用Composer安装依赖库
 
 ~~~
 composer install
 ~~~
 
-同时需要加载手动引入的第三方类库
+3.同时需要加载手动引入的第三方类库
 ~~~
 composer dump-autoload
 ~~~
 
-更新Thinkphp框架（如果需要）
+4.更新Thinkphp框架（如果需要）
 
 ~~~
 composer update topthink/framework
