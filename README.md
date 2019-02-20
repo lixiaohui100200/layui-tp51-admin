@@ -21,7 +21,7 @@
 使用git安装
 
 ~~~
-git clone xx.com/asuma-tp51-beta my-project(项目名称自定义)
+git clone http://gitlab.weijin365.com/lisq/asuma-tp51-beta.git my-project(项目名称自定义)
 ~~~
 
 本框架不支持composer安装，但必须使用Composer安装依赖库
