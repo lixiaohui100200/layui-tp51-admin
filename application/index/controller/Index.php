@@ -1,7 +1,5 @@
 <?php
 namespace app\index\controller;
-use Think\Db;
-use util\Redis;
 
 class Index
 {
