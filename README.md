@@ -36,7 +36,7 @@ composer install
 composer dump-autoload
 ~~~
 
-4.配置环境变量文件
+4.复制环境变量文件
 
 ~~~
 cp .env.example .env
