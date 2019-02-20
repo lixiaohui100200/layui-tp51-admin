@@ -18,7 +18,7 @@
 
 ## 安装步骤
 
-1.使用git安装
+1.使用git安装基础框架
 
 ~~~
 git clone http://gitlab.weijin365.com/lisq/asuma-tp51-beta.git my-project(项目名称自定义)
