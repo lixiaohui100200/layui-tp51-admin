@@ -14,7 +14,7 @@
  + 常用的浏览器检测中间件,微信/钉钉自动授权登录
  + 使用单例模式构造的Redis类
  + 集成阿里短信SDK
- + 集成微信开发SDK -- EasyWeChat
+ + 集成微信开发SDK -- EasyWeChat（[手册传送门](https://www.easywechat.com/docs/master/overview)）
 
 ## 安装步骤
 
