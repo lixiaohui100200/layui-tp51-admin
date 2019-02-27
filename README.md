@@ -31,7 +31,7 @@ cd my-project
 composer install
 ~~~
 
-3.同时需要加载手动引入的第三方类库
+3.同时需要加载手动引入的第三方类库(如果手动引入的类库无法加载时执行)
 ~~~
 composer dump-autoload
 ~~~

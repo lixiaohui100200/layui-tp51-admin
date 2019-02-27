@@ -25,11 +25,11 @@ class Redis{
 	{
 		if(!isset(self::$config)){
 			$config = array(
-				'host' => Config::get('this.REDIS_HOST'),
-				'port' => Config::get('this.REDIS_PORT'),
-				'password' => Config::get('this.REDIS_PASSWORD'),
-				'prefix' => Config::get('this.REDIS_PREFIX'),
-				'hold' =>  Config::get('this.REDIS_HOLD') === true ? 'pconnect' : self::$ishold == 1 ? 'pconnect' : 'connect'
+				'host' => Config::get('this.redis_host'),
+				'port' => Config::get('this.redis_port'),
+				'password' => Config::get('this.redis_password'),
+				'prefix' => Config::get('this.redis_prefix'),
+				'hold' =>  Config::get('this.redis_hold') === true ? 'pconnect' : self::$ishold == 1 ? 'pconnect' : 'connect'
 			);
 
 			self::$config = $config;

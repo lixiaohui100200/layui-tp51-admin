@@ -23,7 +23,7 @@ class Through
             'keyId' => Config::get('this.alisms_key'),
             'keySecret' => Config::get('this.alisms_secret'),
             'phone' => $phone,
-            'sign' => '质链SAAS云平台',
+            'sign' => Config::get('this.alisms_sign'),
             'snscode' => Config::get('this.alisms_snscode')
         );
     	$alisms = AliSms::sendSms($data, ['code' => $msg]);

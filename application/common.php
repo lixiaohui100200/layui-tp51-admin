@@ -94,28 +94,44 @@ function http_scheme()
 }
 
 /**
- * 以get方式提交请求
- * @param $url
- * @return bool|mixed
+ * @param $token array arg0 令牌名称 arg1 令牌值
+ * @author lishuaiqiu
+ * 表单令牌验证
  */
-function httpGet($url)
+function checkFormToken($token = ['__token__', ''])
 {
-    $oCurl = curl_init();
-    if (stripos($url, "https://") !== false) {
-        curl_setopt($oCurl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($oCurl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($oCurl, CURLOPT_SSLVERSION, 1);
-    }
-    curl_setopt($oCurl, CURLOPT_URL, $url);
-    curl_setopt($oCurl, CURLOPT_RETURNTRANSFER, 1);
-    $sContent = curl_exec($oCurl);
-    $aStatus = curl_getinfo($oCurl);
-    curl_close($oCurl);
-    if (intval($aStatus["http_code"]) == 200) {
-        return $sContent;
-    } else {
+    $session_token = \think\facade\Session::get($token[0]);
+
+    if(!is_array($token) || !$token[0] || !$session_token){ //令牌无效
         return false;
     }
+
+    if($session_token === $token[1]){
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * @param $token array arg0 令牌名称 arg1 令牌值
+ * @author lishuaiqiu
+ * 销毁缓存中的表单令牌
+ */
+function destroyFormToken($token = ['__token__', ''])
+{
+    $session_token = \think\facade\Session::get($token[0]);
+
+    if(!is_array($token) || !$token[0] || !$session_token){ //令牌无效
+        return false;
+    }
+
+    if($session_token === $token[1]){
+        \think\facade\Session::delete('__token__');
+        return true;
+    }
+
+    return false;
 }
 
 /**
