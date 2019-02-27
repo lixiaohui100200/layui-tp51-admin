@@ -31,15 +31,15 @@ cd my-project
 composer install
 ~~~
 
-3.同时需要加载手动引入的第三方类库(如果手动引入的类库无法加载时执行)
-~~~
-composer dump-autoload
-~~~
-
-4.复制环境变量文件
+3.复制环境变量文件
 
 ~~~
 cp .env.example .env
+~~~
+
+4.同时需要加载手动引入的第三方类库(如果手动引入的类库无法加载时执行)
+~~~
+composer dump-autoload
 ~~~
 
 5.更新Thinkphp框架（如果需要）
