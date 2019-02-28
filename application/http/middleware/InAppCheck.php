@@ -17,14 +17,14 @@ class InAppCheck
     	if (preg_match('~micromessenger~i', $request->header('user-agent'))) {
             $request->InApp = 'WeChat';
             if(!Session::has('wechat.original.openid')){
-                $this->wechat($request);
+                $this->wechat($request); //微信授权
             }
         } else if (preg_match('~alipay~i', $request->header('user-agent'))) {
             $request->InApp = 'Alipay';
         } else if (preg_match('~dingtalk~i', $request->header('user-agent'))) {
             $request->InApp = 'DingTalk';
             if(!Session::has('ding.openid')){
-                $this->dingtalk($request);
+                //$this->dingtalk($request); //钉钉授权
             }
         } else{
         	$request->InApp = 'Normal';
