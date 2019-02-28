@@ -27,6 +27,7 @@ function i_dump($param)
 }
 
 /**
+ * 优化的base64encode
  * @author lishuaiqiu
  */
 function i_base64encode($string) 
@@ -37,6 +38,7 @@ function i_base64encode($string)
 }
 
 /**
+ * 优化的base64decode
  * @author lishuaiqiu
  */
 function i_base64decode($string) 
@@ -94,9 +96,9 @@ function http_scheme()
 }
 
 /**
+ * 表单令牌验证，防止表单重复提交
  * @param $token array arg0 令牌名称 arg1 令牌值
  * @author lishuaiqiu
- * 表单令牌验证
  */
 function checkFormToken($token = ['__token__', ''])
 {
@@ -114,9 +116,9 @@ function checkFormToken($token = ['__token__', ''])
 }
 
 /**
+ * 销毁缓存中的表单令牌
  * @param $token array arg0 令牌名称 arg1 令牌值
  * @author lishuaiqiu
- * 销毁缓存中的表单令牌
  */
 function destroyFormToken($token = ['__token__', ''])
 {

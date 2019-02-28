@@ -6,6 +6,7 @@ class Index
 {
     public function index()
     {
+        return view();
     	echo "ok index";
     }
 
@@ -14,11 +15,8 @@ class Index
         $data = \think\facade\Request::post();
         $token = ['__token__', $data['__token__']];
         if(checkFormToken($token)){
-
-
-
-
-
+            
+            
             destroyFormToken($token);
             exit('1');
         }
