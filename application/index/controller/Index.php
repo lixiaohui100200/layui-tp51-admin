@@ -5,6 +5,7 @@ class Index
 {
     public function index()
     {
+        return view();
     	echo "ok index";
     }
 
