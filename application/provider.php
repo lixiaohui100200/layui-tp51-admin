@@ -11,4 +11,5 @@
 
 // 应用容器绑定定义
 return [
+	'register' => app\admin\service\Register::class
 ];

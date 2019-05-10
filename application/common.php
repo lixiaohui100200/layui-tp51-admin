@@ -61,7 +61,7 @@ function i_base64decode($string)
  */
 function i_log($output, $filename = '', $suffix = ".log")
 {
-    $logUrl = "../runtime/log/debug/";
+    $logUrl = "../runtime/ilog/";
     $filename == "" && $filename = date('ymd');
 
     !is_dir($logUrl) && mkdir($logUrl , 0777 , true);
@@ -77,6 +77,33 @@ function i_log($output, $filename = '', $suffix = ".log")
     };
 
     file_put_contents($logUrl.$filename.$suffix , $head_str.$output."\r\n" ,FILE_APPEND);
+}
+
+/**
+ * 升级的md5加密，防止暴力破解
+ * +----------------------------------------------------------------------
+ * | 加密步骤（加密过程中所有MD5加密后均为32字符十六进制数）：
+ * +----------------------------------------------------------------------
+ * | 1. 对原字符串进行MD5加密
+ * +----------------------------------------------------------------------
+ * | 2. 得到加密字符串后，从第九位开始（下标为8），共截取14位字符串
+ * +----------------------------------------------------------------------
+ * | 3. 使用约定的密钥key,key的第一个字符拼接到14位字符串首位，key的第二个字符拼接到末尾
+ * +----------------------------------------------------------------------
+ * | 4. 将拼接得到的16位字符串再次使用MD5加密
+ * +----------------------------------------------------------------------
+ * @author lishuaiqiu
+ * @param $str 要加密的字符串
+ * @param $key 自定义加密key 两位的字符串, 自行记录，以免忘记不可随意更改
+ * @return 返回32位字符十六进制数
+ */
+function md5safe($str, $key = 'MY')
+{
+    if (!is_string($key) || strlen($key)<2) return false;
+
+    $en_str = $key[0].substr(md5($str), 8, 14).$key[1];
+
+    return md5($en_str);
 }
 
 /**
@@ -97,18 +124,23 @@ function http_scheme()
 
 /**
  * 表单令牌验证，防止表单重复提交
- * @param $token array arg0 令牌名称 arg1 令牌值
+ * @param $data 表单数据
  * @author lishuaiqiu
  */
-function checkFormToken($token = ['__token__', ''])
+function checkFormToken($data=[])
 {
-    $session_token = \think\facade\Session::get($token[0]);
+    $token = config('this.form_token');
+    if(!isset($data[$token])){
+        return false;
+    }
+    
+    $session_token = \think\facade\Session::get($token);
 
-    if(!is_array($token) || !$token[0] || !$session_token){ //令牌无效
+    if(!$token || !$session_token){ //令牌无效
         return false;
     }
 
-    if($session_token === $token[1]){
+    if($session_token === $data[$token]){
         return true;
     }
 
@@ -117,18 +149,23 @@ function checkFormToken($token = ['__token__', ''])
 
 /**
  * 销毁缓存中的表单令牌
- * @param $token array arg0 令牌名称 arg1 令牌值
+ * @param $data 表单数据
  * @author lishuaiqiu
  */
-function destroyFormToken($token = ['__token__', ''])
+function destroyFormToken($data=[])
 {
-    $session_token = \think\facade\Session::get($token[0]);
-
-    if(!is_array($token) || !$token[0] || !$session_token){ //令牌无效
+    $token = config('this.form_token');
+    if(!isset($data[$token])){
         return false;
     }
 
-    if($session_token === $token[1]){
+    $session_token = \think\facade\Session::get($token);
+
+    if(!$token || !$session_token){ //令牌无效
+        return false;
+    }
+
+    if($session_token === $data[$token]){
         \think\facade\Session::delete('__token__');
         return true;
     }
@@ -170,4 +207,31 @@ function rand_str($length=16)
         $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
     }
     return $str;
+}
+
+/**
+ * @param $code 状态码
+ * @author lishuaiqiu
+ * Admin后台json数据全局统一返回格式
+ */
+function res_json(int $code=100, $result="")
+{
+    return json(['code' => $code, 'result' => $result]);
+}
+
+function res_json_str($code= 100, $result='')
+{
+    $data = ['code' => $code, 'result' => $result];
+    return json()->data($data)->getContent();
+}
+
+/**
+ * @param $code 状态码
+ * @author lishuaiqiu
+ * Admin后台table数据全局统一返回格式
+ */
+function table_json($data = [], $count = 0, $code = 0, $msg = "")
+{
+    $count <= 10 && $count = 0; //小于10条时隐藏layui分页功能
+    return json(['code' => $code, 'msg' => $msg, 'count' => $count, 'data' => $data]);
 }

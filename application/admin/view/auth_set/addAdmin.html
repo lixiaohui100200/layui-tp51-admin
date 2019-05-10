@@ -1,0 +1,81 @@
+{extend name="public/original" /}
+{block name="title"}udzanPro - 添加管理员{/block}
+{block name="content"}
+<div class="layui-form" lay-filter="layuiadmin-form-admin" id="layuiadmin-form-admin" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+      <label class="layui-form-label">登录名</label>
+      <div class="layui-input-inline">
+        <input type="text" name="loginname" lay-verType="tips" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">用户名</label>
+      <div class="layui-input-inline">
+        <input type="text" name="username" lay-verType="tips" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">手机</label>
+      <div class="layui-input-inline">
+        <input type="text" name="phone" lay-verType="tips" lay-verify="adminPhone" placeholder="请输入号码" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">邮箱</label>
+      <div class="layui-input-inline">
+        <input type="text" name="email" lay-verType="tips" lay-verify="adminEmail" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">密码</label>
+      <div class="layui-input-inline">
+        <input type="text" name="password" placeholder="默认：123456" class="layui-input" disabled="">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">角色</label>
+      <div class="layui-input-inline">
+        <select name="role" lay-verType="tips" lay-verify="required">
+          <option value="">请选择</option>
+          <option disabled="">超级管理员</option>
+          <option value="1">管理员</option>
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">状态</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" lay-filter="switch" name="status" lay-skin="switch" lay-text="正常|待审核" value="1">
+      </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+      <input type="hidden" name="{:config('this.form_token')}" value="{$Request.token}" />
+      <input type="button" lay-submit lay-filter="LAY-user-front-submit" id="LAY-user-back-submit" value="确认">
+    </div>
+  </div>
+{/block}
+{block name="footjs"}
+<script>
+  layui.use(['form'], function(){
+    var $ = layui.$ ,form = layui.form ;
+    form.verify({
+      adminPhone:function(value, item){
+        if(!value && !$('input[name="email"]').val()){
+          return '手机号和邮箱必填一项';
+        }
+        if(value && ! /^1[356789]{1}\d{9}$/.test(value)){
+          return '手机号格式不正确';
+        }
+      },
+      adminEmail:function(value, item) {
+        if(!value && !$('input[name="phone"]').val()){
+          return '手机号和邮箱必填一项';
+        }
+        if(value && ! /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(value)){
+          return '邮箱格式不正确';
+        }
+      }
+    })
+  })
+</script>
+{/block}

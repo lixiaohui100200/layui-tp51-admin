@@ -16,3 +16,9 @@ Route::group('do', function(){
 		'sendmsg' => 'through/sendMsgCode' //发送验证码
 	]);
 });
+
+Route::group('admin', function(){
+	Route::group(['method' => 'post'],[
+		'/' => 'admin/index/index'
+	]);
+});

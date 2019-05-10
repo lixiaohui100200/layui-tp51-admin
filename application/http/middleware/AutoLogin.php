@@ -15,7 +15,7 @@ class AutoLogin
      * 跳转地址，支持符合规则的路由或模块/控制器/方法
      *
      */
-    protected $redirect_url = 'login';  // 必设项，检测到未登录的跳转地址
+    protected $redirect_url = 'login';  // 必设项，检测到未登录时的跳转地址
 
     /**
      * 排除的验证地址
@@ -38,7 +38,7 @@ class AutoLogin
     		
             //登录业务逻辑
             // .....
-
+            
             if($user){
                 //示例
                 //Session::set('user.id', $user['id']);

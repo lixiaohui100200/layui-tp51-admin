@@ -1,3 +1,6 @@
+/**
+* 接收从后端传过来的header标记，解决ajax不能跳转的问题
+*/
 $.ajaxSetup({ 
     complete:function(XMLHttpRequest, textStatus){
         if("redirect" == XMLHttpRequest.getResponseHeader("Ajax-Mark")){ 

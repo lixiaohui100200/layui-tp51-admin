@@ -3,7 +3,7 @@
 {block name="content"}
 <form>
 	<input type="text" name="title" value="nihao">
-	<input type="hidden" name="__token__" value="{$Request.token}" />
+	<input type="hidden" name="{:config('this.form_token')}" value="{$Request.token}" />
 	<button type="button" id="sure">确定</button>
 </form>
 {/block}

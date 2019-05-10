@@ -1,23 +1,21 @@
 <?php
 namespace app\index\controller;
-use think\facade\Hook;
-use util\Test;
+
 class Index
 {
     public function index()
     {
-        return view();
     	echo "ok index";
     }
 
     public function test()
     {
         $data = \think\facade\Request::post();
-        $token = ['__token__', $data['__token__']];
-        if(checkFormToken($token)){
+        if(checkFormToken($data)){
             
+            //code...
             
-            destroyFormToken($token);
+            destroyFormToken($data);
             exit('1');
         }
 

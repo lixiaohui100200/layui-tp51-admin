@@ -1,18 +1,13 @@
 <?php
 namespace app\index\controller;
 use think\Controller;
-use Session;
-use util\Redis;
-use Db;
 
 class Base extends Controller
 {
-	protected $dingOpenid = "";
 	protected $wx_openid = "";
 
-	public function initialize()
+	protected function initialize()
 	{
-		$this->dingOpenid = Session::get('ding.openid');
 		$this->userPhone = "";
 		$this->wx_openid = "";
 	}

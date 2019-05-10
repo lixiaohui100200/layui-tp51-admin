@@ -1,0 +1,174 @@
+{extend name="public/base" /}
+{block name="title"}udzanPro - 基于layuiAdmin的通用后台管理系统{/block}
+{block name="content"}
+<div class="layui-fluid">   
+  <div class="layui-card">
+    <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">登录名</label>
+          <div class="layui-input-block">
+            <input type="text" name="loginname" placeholder="请输入" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">手机</label>
+          <div class="layui-input-block">
+            <input type="text" name="telphone" placeholder="请输入" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">邮箱</label>
+          <div class="layui-input-block">
+            <input type="text" name="email" placeholder="请输入" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">角色</label>
+          <div class="layui-input-block">
+            <select name="role">
+              <option value="0">管理员</option>
+              <option value="1">超级管理员</option>
+              <option value="2">纠错员</option>
+              <option value="3">采购员</option>
+              <option value="4">推销员</option>
+              <option value="5">运营人员</option>
+              <option value="6">编辑</option>
+            </select>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <button class="layui-btn layui-btn-asuma layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search">
+            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="layui-card-body">
+      <div style="padding-bottom: 10px;">
+        <button class="layui-btn layui-btn-asuma layuiadmin-btn-admin" data-type="batchdel">删除</button>
+        <button class="layui-btn layui-btn-asuma layuiadmin-btn-admin" data-type="add">添加</button>
+      </div>
+      
+      <table id="udzan-admin" lay-filter="udzan-admin"></table>  
+      
+    </div>
+  </div>
+</div>
+{/block}
+{block name="footjs"}
+<script>
+  layui.config({
+    base: '__THIRD__/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'table'], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,table = layui.table;
+
+    table.render({
+      elem: '#udzan-admin'
+      ,url: "{:url('adminList')}" //数据接口
+      ,page: true //开启分页
+      ,limits:[10,15,20]
+      ,cols: [[ //表头
+        {field: 'id', title: 'ID',  sort: true, width:65}
+        ,{field: 'login_name', title: '用户名'}
+        ,{field: 'name', title: '姓名'}
+        ,{field: 'phone', title: '手机号'} 
+        ,{field: 'email', title: '邮箱'}
+        ,{field: 'create_time', title: '创建时间', sort: true}
+        ,{field: 'status', title: '状态', templet: function(d){
+          var status = ''
+          switch(d.status){
+            case 1:  status = '正常' ;break;
+            case 0:  status = '待审核'; break;
+            case -2:  status = '冻结'; break;
+            default: status = '异常';break;
+          }
+          return status;
+        }}
+        ,{title: '操作'}
+      ]]
+    });
+    
+    //监听搜索
+    form.on('submit(LAY-user-back-search)', function(data){
+      var field = data.field;
+      
+      //执行重载
+      table.reload('LAY-user-back-manage', {
+        where: field
+      });
+    });
+
+    //事件
+    var active = {
+      batchdel: function(){
+        var checkStatus = table.checkStatus('LAY-user-back-manage')
+        ,checkData = checkStatus.data; //得到选中的数据
+
+        if(checkData.length === 0){
+          return layer.msg('请选择数据');
+        }
+        
+        layer.prompt({
+          formType: 1
+          ,title: '敏感操作，请验证口令'
+        }, function(value, index){
+          layer.close(index);
+          
+          layer.confirm('确定删除吗？', function(index) {
+            
+            //执行 Ajax 后重载
+            /*
+            admin.req({
+              url: 'xxx'
+              //,……
+            });
+            */
+            table.reload('LAY-user-back-manage');
+            layer.msg('已删除');
+          });
+        }); 
+      }
+      ,add: function(){
+        layer.open({
+          type: 2
+          ,title: '添加管理员'
+          ,content: "{:url('addAdmin')}"
+          ,area: ['420px', '500px']
+          ,btn: ['确定', '取消']
+          ,yes: function(index, layero){
+            var iframeWindow = window['layui-layer-iframe'+ index]
+            ,submitID = 'LAY-user-back-submit'
+            ,laySubmitId = 'LAY-user-front-submit'
+            ,submit = layero.find('iframe').contents().find('#'+ submitID);
+
+            //监听提交
+            iframeWindow.layui.form.on('submit('+ laySubmitId +')', function(data){
+              var field = data.field; //获取提交的字段
+              
+              //提交 Ajax 成功后，静态更新表格中的数据
+              $.post("{:url('pulladmin')}", field, function(data){
+                console.log(data);
+              })
+              // table.reload('LAY-user-front-submit'); //数据刷新
+              // layer.close(index); //关闭弹层
+              
+            });  
+            
+            submit.trigger('click');
+          }
+        }); 
+      }
+    }  
+    $('.layui-btn.layuiadmin-btn-admin').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+</script>
+{/block}

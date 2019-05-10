@@ -1,0 +1,135 @@
+{extend name="public/base" /}
+{block name="title"}udzanPro - 基于layuiAdmin的通用后台管理系统{/block}
+{block name="content"}
+  <div class="layui-fluid">   
+    <div class="layui-card">
+      <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            角色筛选
+          </div>
+          <div class="layui-inline">
+            <select name="rolename" lay-filter="LAY-user-adminrole-type">
+              <option value="-1">全部角色</option>
+              <option value="0">管理员</option>
+              <option value="1">超级管理员</option>
+              <option value="2">纠错员</option>
+              <option value="3">采购员</option>
+              <option value="4">推销员</option>
+              <option value="5">运营人员</option>
+              <option value="6">编辑</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="layui-card-body">
+        <div style="padding-bottom: 10px;">
+          <button class="layui-btn layui-btn-asuma layuiadmin-btn-role" data-type="batchdel">删除</button>
+          <button class="layui-btn layui-btn-asuma layuiadmin-btn-role" data-type="add">添加</button>
+        </div>
+      
+        <table id="udzan-role" lay-filter="udzan-role"></table>  
+       
+      </div>
+    </div>
+  </div>
+{/block}
+{block name="footjs"}
+<script>
+  layui.config({
+    base: '__THIRD__/layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'table'], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,table = layui.table;
+
+    table.render({
+      elem: '#udzan-role'
+      ,url: "{:url('roleList')}" //数据接口
+      ,page: true //开启分页
+      ,limits:[10,15,20]
+      ,cols: [[ //表头
+        {field: 'id', title: 'ID',  sort: true, width:65}
+        ,{field: 'title', title: '角色名'}
+        ,{field: 'remark', title: '描述'}
+        ,{field: 'status', title: '状态', templet: function(d){
+          var status = ''
+          switch(d.status){
+            case 1:  status = '正常' ; break;
+            case -2:  status = '冻结'; break;
+            default: status = '异常'; break;
+          }
+          return status;
+        }}
+        ,{title: '操作'}
+      ]]
+    });
+    
+    //搜索角色
+    form.on('select(LAY-user-adminrole-type)', function(data){
+      //执行重载
+      table.reload('LAY-user-back-role', {
+        where: {
+          role: data.value
+        }
+      });
+    });
+  
+    //事件
+    var active = {
+      batchdel: function(){
+        var checkStatus = table.checkStatus('LAY-user-back-role')
+        ,checkData = checkStatus.data; //得到选中的数据
+
+        if(checkData.length === 0){
+          return layer.msg('请选择数据');
+        }
+        
+        layer.confirm('确定删除吗？', function(index) {
+            
+          //执行 Ajax 后重载
+          /*
+          admin.req({
+            url: 'xxx'
+            //,……
+          });
+          */
+          table.reload('LAY-user-back-role');
+          layer.msg('已删除');
+        });
+      },
+      add: function(){
+        layer.open({
+          type: 2
+          ,title: '添加新角色'
+          ,content: 'roleform.html'
+          ,area: ['500px', '480px']
+          ,btn: ['确定', '取消']
+          ,yes: function(index, layero){
+            var iframeWindow = window['layui-layer-iframe'+ index]
+            ,submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
+
+            //监听提交
+            iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
+              var field = data.field; //获取提交的字段
+              
+              //提交 Ajax 成功后，静态更新表格中的数据
+              //$.ajax({});              
+              table.reload('LAY-user-back-role');
+              layer.close(index); //关闭弹层
+            });  
+            
+            submit.trigger('click');
+          }
+        }); 
+      }
+    }  
+    $('.layui-btn.layuiadmin-btn-role').on('click', function(){
+      var type = $(this).data('type');
+      active[type] ? active[type].call(this) : '';
+    });
+  });
+  </script>
+{/block}

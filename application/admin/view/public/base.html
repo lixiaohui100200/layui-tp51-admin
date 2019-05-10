@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{block name="title"}<!--使用thinkphp模板引擎 引入标题-->{/block}</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="__THIRD__/layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="__THIRD__/layuiadmin/style/admin.css" media="all">
+  <link rel="stylesheet" href="__CSS__/default.css" media="all">
+  {block name="css"}<!--使用thinkphp模板引擎 引入css-->{/block}
+  <script type="text/javascript" src="__JS__/public/jquery.min.js"></script>
+  {block name="headjs"}<!--使用thinkphp模板引擎 引入js-->{/block}
+</head>
+<body>
+	{block name="content"}<!--使用thinkphp模板引擎 引入主体内容-->{/block}
+	<script type="text/javascript" src="__JS__/public/ajax-rediect.js"></script>
+	<script src="__THIRD__/layuiadmin/layui/layui.js"></script>
+	{block name="footjs"}<!--使用thinkphp模板引擎 引入js-->{/block}
+</body>
+</html>

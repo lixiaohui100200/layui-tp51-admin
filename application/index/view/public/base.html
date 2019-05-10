@@ -8,13 +8,17 @@
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 	<meta name="format-detection" content="telephone=no" />
+	<!--使用thinkphp模板引擎 引入css-->
 	{block name="css"}{/block}
 	<script type="text/javascript" src="__JS__/public/jquery-3.3.1.min.js"></script>
+	<!--使用thinkphp模板引擎 引入js-->
 	{block name="headjs"}{/block}
 </head>
 <body>
+	<!--使用thinkphp模板引擎 引入主体内容-->
 	{block name="content"}{/block}
 	<script type="text/javascript" src="__JS__/public/ajax-rediect.js"></script>
+	<!--使用thinkphp模板引擎 引入js-->
 	{block name="footjs"}{/block}
 </body>
 </html>
