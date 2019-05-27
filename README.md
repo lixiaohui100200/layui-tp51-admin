@@ -56,7 +56,7 @@ composer update topthink/framework
 
 ## 作者
 
-+ [微博](weibo.com/770878450)
++ [微博](https://weibo.com/770878450)
 + [个人网站](http://www.udzan.com/)
 
 ## 在线手册
