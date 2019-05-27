@@ -72,4 +72,17 @@ class AuthSet extends Base
 
         return table_json($roles, $count);
     }
+
+    public function permissions()
+    {
+        return $this->fetch();
+    }
+
+    public function permissionsList()
+    {
+        $admin = Db::table('auth_rule')->field('id,name,title,status,sorted')->select();
+        $count = Db::table('admin_user')->count();
+        
+        return table_json($admin, $count);
+    }
 }

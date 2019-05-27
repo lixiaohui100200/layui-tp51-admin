@@ -139,7 +139,7 @@ function checkFormToken($data=[])
     if(!$token || !$session_token){ //令牌无效
         return false;
     }
-
+    
     if($session_token === $data[$token]){
         return true;
     }
@@ -182,7 +182,7 @@ function checkPhone($mobile)
     if (!is_numeric($mobile)) {
         return false;
     }
-    return preg_match('#^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[\d]{9}$|^18[\d]{9}$#', $mobile) ? true : false;
+    return preg_match('#^13[\d]{9}$|^15[^4]{1}\d{8}$|^16[68]{1}\d{8}$|^17[\d]{9}$|^18[\d]{9}$|^19[89]{1}\d{8}$#', $mobile) ? true : false;
 }
 
 /**

@@ -8,17 +8,15 @@ use Session;
 
 class Login 
 {
-    public function index()
+    public function index(Request $request)
     {
         return view();
     }
 
     public function checkLogin(Request $request)
     {
-        $loginUser = [];
-        if(app('register')->check($request->post(), $loginUser)){
-            !Register::login($loginUser, $request->post('remembered')) && exit(res_json_str(0, '登录失败'));;
-        }
+        $loginUser = Register::check($request->post());
+        !Register::login($loginUser, $request->post('remembered')) && exit(res_json_str(0, '登录失败'));;
         
         return res_json(1);
     }

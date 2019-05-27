@@ -9,6 +9,7 @@
 namespace app\http\middleware;
 use Session;
 use Url;
+use auth\facade\Permissions;
 
 class BackAuthLogin
 {
@@ -20,8 +21,8 @@ class BackAuthLogin
 
     /**
      * 排除的验证地址
-     * 支持完整的路由规则，或者模块/控制器/方法。若需要精确到方法，请使用完整的路由地址（模块/控制器/方法）
-     *
+     * 优先匹配路由规则，或者模块/控制器/方法。若需要精确到方法，请使用完整的模块路由地址（例：模块/控制器/方法）
+     * 支持 模块，模块/控制器，模块/控制器/方法
      * @var array
      */
     protected $except = [
@@ -37,15 +38,23 @@ class BackAuthLogin
     	if(!app('register')->isLogined()){
             //用户未登录后跳转
             if($request->isAjax()){
-                header('Ajax-Mark: redirect');
-                header("Redirect-Path: ".Url::build($this->redirect_url));
-                //ajax的url请求由js接收跳转
+                //返回head头 ajax的url请求由js接收跳转
+                return response()->header([
+                    'Ajax-Mark' => ' redirect',
+                    'Redirect-Path' => Url::build($this->redirect_url)
+                ]);
             }else{
                 return redirect($this->redirect_url);
             }
-            exit(); //执行跳转后进行业务隔离阻断，防止程序继续执行,主要作用于ajax请求
     	}else{
-            $userInfo = Session::get(config('this.auth_key'));
+            $userInfo = Session::get(config('auth_key'));
+            $node = $request->controller().'/'.$request->action();
+
+            // 权限检测
+            if(!Permissions::check($node, $userInfo['uid'])){
+                // return view('/public/error', ['icon' => '#xe6af', 'error' => '没有权限访问哦']);
+            }
+
             $request->uid = $userInfo['uid'];
             $request->uname = $userInfo['uname'];
         }

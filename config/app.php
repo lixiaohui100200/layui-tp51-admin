@@ -134,10 +134,10 @@ return [
     'dispatch_error_tmpl'    => Env::get('think_path') . 'tpl/dispatch_jump.tpl',
 
     // 异常页面的模板文件
-    'exception_tmpl'         => Env::get('think_path') . 'tpl/think_exception.tpl',
+    'exception_tmpl'         => Env::get('root_path') . 'public/tpl/think_exception.tpl',
 
     // 错误显示信息,非调试模式有效
-    'error_message'          => '页面错误！请稍后再试～',
+    'error_message'          => '网站出错啦! 出现错误我也很无奈啊o(╯□╰)o',
     // 显示错误信息
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle

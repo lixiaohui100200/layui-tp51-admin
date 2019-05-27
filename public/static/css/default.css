@@ -2,6 +2,7 @@
 .layui-btn{border-radius:3px;}
 .layui-laypage-em{border-radius:3px;}
 .layui-label-asuma{width: auto;}
+.asuma-form-item label{width: 60px;}
 
 /*主题色*/
 .layui-nav-tree .layui-this, .layui-nav-tree .layui-this > a, .layui-nav-tree .layui-nav-child dd.layui-this, .layui-nav-tree .layui-nav-child dd.layui-this a{background-color:#1163C6 !important;}
@@ -21,3 +22,8 @@
 
 /*layer*/
 .asuma-layer .layui-layer-btn0{background-color:#338fe5;border-color:#338fe5;}
+
+/*error 页*/
+.error-tips{margin-top:100px;}
+.layadmin-tips .layui-text{border-top:4px solid #747883;}
+.layadmin-tips .layui-icon[face]{color: #747883;}

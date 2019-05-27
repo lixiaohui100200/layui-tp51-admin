@@ -18,8 +18,8 @@ class Register
 
 	public function __construct()
 	{
-		$this->key = Config::get('this.auth_key');
-		$this->cookie_key = Config::get('this.auth_key_incookie');
+		$this->key = Config::get('auth_key');
+		$this->cookie_key = Config::get('auth_key_incookie');
 	}
 
 	/**
@@ -37,8 +37,12 @@ class Register
 
 	/**
 	*  验证登录/注册
+	*  @param $post 表单提交信息
+	*  @param $boolval 为true返回值布尔类型
+	*  @param $loginUser 用户信息，facade方法使用会报致命错误
+	*  成功返回用户信息
 	*/
-	public function check($post, &$loginUser = [])
+	public function check(array $post, bool $boolval = false, &$loginUser = [])
 	{
 		$validate = new \app\admin\validate\Register;
 		if(!$validate->scene('login')->check($post)){
@@ -53,7 +57,7 @@ class Register
 		$loginUser['status'] == -2 && exit(res_json_str(-4, '账号已被冻结'));
 		$loginUser['status'] == 0 && exit(res_json_str(-5, '账号正在审核'));
 
-		return true;
+		return $boolval ? true : $loginUser;
 	}
 
 	/**

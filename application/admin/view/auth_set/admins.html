@@ -1,10 +1,10 @@
 {extend name="public/base" /}
-{block name="title"}udzanPro - 基于layuiAdmin的通用后台管理系统{/block}
+{block name="title"}后台管理员{/block}
 {block name="content"}
 <div class="layui-fluid">   
   <div class="layui-card">
     <div class="layui-form layui-card-header layuiadmin-card-header-auto">
-      <div class="layui-form-item">
+      <div class="layui-form-item asuma-form-item">
         <div class="layui-inline">
           <label class="layui-form-label">登录名</label>
           <div class="layui-input-block">
@@ -47,7 +47,6 @@
     
     <div class="layui-card-body">
       <div style="padding-bottom: 10px;">
-        <button class="layui-btn layui-btn-asuma layuiadmin-btn-admin" data-type="batchdel">删除</button>
         <button class="layui-btn layui-btn-asuma layuiadmin-btn-admin" data-type="add">添加</button>
       </div>
       
@@ -106,35 +105,7 @@
 
     //事件
     var active = {
-      batchdel: function(){
-        var checkStatus = table.checkStatus('LAY-user-back-manage')
-        ,checkData = checkStatus.data; //得到选中的数据
-
-        if(checkData.length === 0){
-          return layer.msg('请选择数据');
-        }
-        
-        layer.prompt({
-          formType: 1
-          ,title: '敏感操作，请验证口令'
-        }, function(value, index){
-          layer.close(index);
-          
-          layer.confirm('确定删除吗？', function(index) {
-            
-            //执行 Ajax 后重载
-            /*
-            admin.req({
-              url: 'xxx'
-              //,……
-            });
-            */
-            table.reload('LAY-user-back-manage');
-            layer.msg('已删除');
-          });
-        }); 
-      }
-      ,add: function(){
+      add: function(){
         layer.open({
           type: 2
           ,title: '添加管理员'
