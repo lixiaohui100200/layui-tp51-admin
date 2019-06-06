@@ -36,15 +36,16 @@ class Auth{
       * @param name string|array  需要验证的规则列表,支持逗号分隔的权限规则或索引数组
       * @param uid  int           认证用户的id
       * @param relation string    如果为 'or' 表示满足任一条规则即通过验证;如果为 'and'则表示需满足所有规则才能通过验证
-      * @param string mode        执行check的模式      
+      * @param int mark           区别不同的check行为，一般不需设置
+      * @param string mode        执行check的模式 
       * @return boolean           通过验证返回true;失败返回false
      */
-    public function check($name, $uid, $relation = 'or', $type = 1, $mode = 'url') {
+    public function check($name, $uid, $relation = 'or', $mark = 1, $mode = 'url') {
         if (!$this->_config['auth_on']) {
             return true;
         }
 
-        $authList = $this->getAuthList($uid, $type); //获取用户需要验证的所有有效规则列表
+        $authList = $this->getAuthList($uid, $mark); //获取用户需要验证的所有有效规则列表
         if (is_string($name)) {
             $name = strtolower($name);
             if (strpos($name, ',') !== false) {
@@ -112,16 +113,16 @@ class Auth{
     /**
      * 获得权限列表
      * @param integer $uid  用户id
-     * @param integer $type 
+     * @param integer $mark 
      */
-    protected function getAuthList($uid, $type) {
+    protected function getAuthList($uid, $mark) {
         static $_authList = array(); //保存用户验证通过的权限列表
-        $t = implode(',',(array)$type);
-        if (isset($_authList[$uid.$t])) {
-            return $_authList[$uid.$t];
+        
+        if (isset($_authList[$uid.$mark])) {
+            return $_authList[$uid.$mark];
         }
-        if($this->_config['auth_type'] == 2 && isset($_SESSION['_auth_list_'.$uid.$t])){
-            return $_SESSION['_auth_list_'.$uid.$t];
+        if($this->_config['auth_type'] == 2 && isset($_SESSION['_auth_list_'.$uid.$mark])){
+            return $_SESSION['_auth_list_'.$uid.$mark];
         }
 
         //读取用户所属用户组
@@ -132,13 +133,12 @@ class Auth{
         }
         $ids = array_unique($ids);
         if (empty($ids)) {
-            $_authList[$uid.$t] = array();
+            $_authList[$uid.$mark] = array();
             return array();
         }
 
         $map = [
             ['id', 'in', $ids],
-            ['type', '=', $type],
             ['status', '=', 1]
         ];
         
@@ -162,10 +162,10 @@ class Auth{
             }
         }
 
-        $_authList[$uid.$t] = $authList;
+        $_authList[$uid.$mark] = $authList;
         if($this->_config['auth_type'] == 2){
             //规则列表结果保存到session
-            $_SESSION['_auth_list_'.$uid.$t] = $authList;
+            $_SESSION['_auth_list_'.$uid.$mark] = $authList;
         }
         
         return array_unique($authList);

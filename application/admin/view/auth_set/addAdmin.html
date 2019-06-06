@@ -57,7 +57,7 @@
 {block name="footjs"}
 <script>
   layui.use(['form'], function(){
-    var $ = layui.$ ,form = layui.form ;
+    var form = layui.form ;
     form.verify({
       adminPhone:function(value, item){
         if(!value && !$('input[name="email"]').val()){

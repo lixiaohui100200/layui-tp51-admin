@@ -1,43 +1,35 @@
 {extend name="public/base" /}
 {block name="title"}权限管理{/block}
+{block name="css"}
+<style type="text/css">
+.menu-search{width: auto !important;margin-right: 0 !important;margin-left: 30px;}
+.menu-search .layui-form-checkbox[lay-skin="primary"]{margin-top: 0;}
+</style>
+{/block}
 {block name="content"}
 <div class="layui-fluid">
 <div class="layui-card">
   <div class="layui-form layui-card-header layuiadmin-card-header-auto">
     <div class="layui-form-item asuma-form-item">
       <div class="layui-inline">
-        <label class="layui-form-label">文章ID</label>
-        <div class="layui-input-inline">
-          <input type="text" name="id" placeholder="请输入" autocomplete="off" class="layui-input">
+        <div class="layui-input-inline menu-search">
+          <input type="checkbox" name="is_menu" lay-skin="primary" title="只筛选菜单" lay-filter="chooseMenu" value="1">
         </div>
       </div>
       <div class="layui-inline">
-        <label class="layui-form-label">作者</label>
-        <div class="layui-input-inline">
-          <input type="text" name="author" placeholder="请输入" autocomplete="off" class="layui-input">
-        </div>
-      </div>
-      <div class="layui-inline">
-        <label class="layui-form-label">标题</label>
+        <label class="layui-form-label">名称</label>
         <div class="layui-input-inline">
           <input type="text" name="title" placeholder="请输入" autocomplete="off" class="layui-input">
         </div>
       </div>
       <div class="layui-inline">
-        <label class="layui-form-label">文章标签</label>
+        <label class="layui-form-label">规则</label>
         <div class="layui-input-inline">
-          <select name="label">
-            <option value="">请选择标签</option>
-            <option value="0">美食</option>
-            <option value="1">新闻</option>
-            <option value="2">八卦</option>
-            <option value="3">体育</option>
-            <option value="4">音乐</option>
-          </select>
+          <input type="text" name="name" placeholder="请输入" autocomplete="off" class="layui-input">
         </div>
       </div>
       <div class="layui-inline">
-        <button class="layui-btn layui-btn-asuma layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search">
+        <button class="layui-btn layui-btn-asuma layuiadmin-btn-list" lay-submit lay-filter="listSearch">
           <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
         </button>
       </div>
@@ -56,63 +48,210 @@
 </div>
 {/block}
 {block name="footjs"}
+<script type="text/html" id="menuTpl">
+  <input type="checkbox" name="is_menu" value="{{d.is_menu}}" lay-skin="switch" lay-text="是|否" {{d.is_menu == 1 ? 'checked' : ''}}>
+</script>
+<script type="text/html" id="loggedTpl">
+  {{# if(d.run_type == 2){ }}
+  <input type="checkbox" name="is_logged" value="{{d.id}}" lay-filter="logSwitch" lay-skin="switch" lay-text="是|否" {{d.is_logged == 1 ? 'checked' : ''}}>
+  {{# }else{ }}
+  <button class="layui-btn layui-btn-xs layui-btn-disabled">限制</button>
+  {{# } }}
+</script>
+<script type="text/html" id="statusTpl">
+  <input type="checkbox" name="status" value="{{d.id}}" title="开启" lay-filter="optstatus" {{d.status == 1 ? 'checked' : ''}}>
+</script>
+<script type="text/html" id="optTpl">
+  <a class="layui-btn layui-btn-asuma layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
 <script>
   layui.config({
     base: '__THIRD__/layuiadmin/' //静态资源所在路径
   }).extend({
-    index: 'lib/index' //主入口模块
-  }).use(['index', 'table'], function(){
+    //index: 'lib/index' //主入口模块
+  }).use(['table'], function(){
     var table = layui.table
     ,form = layui.form;
 
-    table.render({
+    var tableIns = table.render({
       elem: '#udzan-rule'
+      ,id: 'pmlist'
       ,url: "{:url('permissionsList')}" //数据接口
       ,page: true //开启分页
-      ,limits:[10,15,20]
+      ,limit:20
+      ,limits:[15,20,30,50]
+      ,done:function (res, curr, count) {
+        if(count <= this.limit){
+          $('.layui-table-page').addClass('layui-hide');//总条数小于每页限制条数时隐藏分页
+        }
+      }
       ,cols: [[ //表头
-      	{field: 'title', title: '名称'}
-      	,{field: 'type', title: '类型'}
-        ,{field: 'name', title: '规则'}
-        ,{field: 'sorted', title: '权重'}
-        ,{field: 'status', title: '状态', templet: function(d){
-          var status = ''
-          switch(d.status){
-            case 1:  status = '正常' ; break;
-            case -2:  status = '冻结'; break;
-            default: status = '异常'; break;
+      	{field: 'title', title: '名称', minWidth : '140',templet: function(d){
+          var str = '';
+          switch(d.level){
+            case 1: 
+              str = '<span style="padding:0 5px 0 8px;">└</span>';
+              break;
+            case 2: 
+              str = '<span style="padding:0 5px 0 25px;">└</span>';
+              break;
           }
-          return status;
+          return str+d.title;
         }}
-        ,{title: '操作'}
+      	,{field: 'type', title: '权限类型', templet:function(d){
+          let typeStr = ''
+          switch(d.type){
+            case 1: typeStr = '模块'; break;
+            case 2: typeStr = '子模块'; break;
+            case 3: typeStr = '节点'; break;
+          }
+
+          return typeStr;
+        }}
+        ,{field: 'name', title: '标识'}
+        ,{field: 'run_type', title: '表现类型', templet: function(d){
+          var run_type = ''
+          switch(d.run_type){
+            case 1:  run_type = '普通' ; break;
+            case 2:  run_type = '异步'; break;
+          }
+          return run_type;
+        }}
+        ,{field: 'is_menu', title: '是否菜单', templet: function(d){
+          if(d.is_menu){
+            return '<button class="layui-btn layui-btn-xs layui-btn-normal">是</button>'
+          }else{
+            return '<button class="layui-btn layui-btn-xs layui-btn-primary">否</button>'
+          }
+        }}
+        ,{field: 'icon', title: '图标', templet: function(d){
+          if(d.icon){
+            return '<i class="layui-icon '+d.icon+'"></i>'
+          }else{
+            return '';
+          }
+        }}
+        ,{field: 'sorted', title: '权重', edit : 'text'}
+        ,{field: 'is_logged', title: '记录日志', templet:"#loggedTpl"}
+        ,{field: 'status', title: '状态', templet: '#statusTpl'}
+        ,{title: '操作',toolbar: '#optTpl'}
       ]]
     });
+
+    form.on('checkbox(chooseMenu)', function(data){
+      let is_menu = 0;
+      if(data.elem.checked == true){
+        is_menu = 1
+      }
+      $('input[name="title"]').val('');
+      $('input[name="name"]').val('');
+      //执行重载
+      tableIns.reload({
+        where: {is_menu: is_menu, title: null, name : null}
+        ,page:{curr:1}
+      });
+    })
     
     //监听搜索
-    form.on('submit(LAY-app-contlist-search)', function(data){
-      var field = data.field;
+    form.on('submit(listSearch)', function(data){
+      let field = data.field;
       
       //执行重载
-      table.reload('LAY-app-content-list', {
+      tableIns.reload({
         where: field
+        ,page:{curr:1}
       });
+
+      return false;
     });
+
+    //日志开关
+    form.on('switch(logSwitch)', function(obj){
+      var wish = obj.elem.checked
+
+      $.post("{:url('changeLogStatus')}",{id: obj.value, is_logged: wish}, function(res){
+        if(res.code != 1){
+          layer.tips(res.result, obj.othis, {tips:1});
+          obj.elem.checked = !wish;
+          form.render('checkbox');
+        }
+      },'json')
+    })
+
+    form.on('checkbox(optstatus)', function(obj){
+      var wish = obj.elem.checked
+      var id = obj.value
+      $.post("{:url('changeRuleStatus')}",{id:id, status: wish}, function(res){
+        if(res.code != 1){
+          layer.tips(res.result, obj.othis, {tips:1});
+          obj.elem.checked = !wish;
+          form.render('checkbox');
+        }
+      }, 'json')
+    })
+
+    table.on('edit(udzan-rule)', function(obj){
+      var is_menu = obj.data.is_menu
+      if(is_menu != 1){
+        var objVal = $(this).prev().text();
+        layer.tips('非菜单无法设置权重', obj.tr.find('td:eq(6)'), {tips:1});
+        setTimeout(function(){obj.update({sorted : objVal})})
+        return false;
+      }
+
+      if(!/^(0|[1-9]+[0-9]*)$/.test(obj.value)){
+        layer.tips('请输入正确的数值', obj.tr.find('td:eq(6)'), {tips:1});
+        setTimeout(function(){obj.update({sorted : objVal})})
+        return false;  
+      }
+
+      $.post("{:url('changeWeight')}",{id: obj.data.id, newVal: obj.value, is_menu : is_menu}, function(res){
+        if(res.code != 1){
+          layer.tips(res.result, obj.tr.find('td:eq(6)'), {tips:1});
+          obj.update({sorted : objVal})
+        }else{
+          tableIns.reload()
+        }
+      }, 'json')
+    })
+
+    table.on('tool(udzan-rule)', function(obj){
+      if(obj.event == 'del'){
+        active['del'].call(this, obj);
+      }else if(obj.event == 'weightchange'){
+        console.log(obj)
+      }
+    })
     
-    var $ = layui.$, active = {
+    var active = {
       add: function(){
         layer.open({
           type: 2
-          ,title: '添加文章'
-          ,content: 'listform.html'
+          ,title: '添加权限'
+          ,content: "{:url('authEdit')}"
           ,maxmin: true
-          ,area: ['550px', '550px']
+          ,area: ['820px', '600px']
           ,btn: ['确定', '取消']
           ,yes: function(index, layero){
             //点击确认触发 iframe 内容中的按钮提交
-            var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+            var submit = layero.find('iframe').contents().find("#auth-submit");
             submit.click();
           }
         });
+      }
+      ,del: function(obj){
+        layer.prompt({title: '请输入密码', formType: 1},function(value, index, elem){
+          $.post("{:url('changeRuleStatus')}",{id:obj.data.id, status: 'delete', password: value}, function(res){
+            if(res.code == 1){
+              layer.close(index)
+              tableIns.reload()
+            }else{
+              layer.msg(res.result);
+            }
+          }, 'json')
+        });
+        
       }
     };
 

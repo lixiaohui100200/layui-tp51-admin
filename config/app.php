@@ -137,9 +137,9 @@ return [
     'exception_tmpl'         => Env::get('root_path') . 'public/tpl/think_exception.tpl',
 
     // 错误显示信息,非调试模式有效
-    'error_message'          => '网站出错啦! 出现错误我也很无奈啊o(╯□╰)o',
+    'error_message'          => '网站出错啦! 意不意外，惊不惊喜(～o￣3￣)～ ',
     // 显示错误信息
-    'show_error_msg'         => false,
+    'show_error_msg'         => Env::get('SHOW_ERROR_MSG', false),
     // 异常处理handle类 留空使用 \think\exception\Handle
     'exception_handle'       => '',
 

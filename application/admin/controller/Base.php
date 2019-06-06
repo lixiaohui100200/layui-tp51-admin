@@ -11,6 +11,28 @@ class Base extends Controller
     {
         // echo "init ";
     }
+
+
+    public function parseWhere($where): array
+    {
+        unset($where['limit']);
+        unset($where['page']);
+
+        if(empty($where)) return [];
+
+        $condition = [];
+        foreach ($where as $v) {
+            if(strlen($v[2]) < 1){
+                continue;
+            }
+            
+            $v2 = &$v[2];
+            in_array(strtoupper($v[1]), ['LIKE', 'NOT LIKE']) &&  $v2 =  '%'.$v2.'%';
+            $condition[] = $v;
+        }
+
+        return $condition;
+    }
     
     /**
      * @param $code 状态码
@@ -19,7 +41,7 @@ class Base extends Controller
      */
     public function table_json($data = [], $count = 0, $code = 0, $msg = "")
     {
-        $count <= 10 && $count = 0; //小于10条时隐藏layui分页功能
+        //$count <= 10 && $count = 0; //小于10条时隐藏layui分页功能
         return json(['code' => $code, 'msg' => $msg, 'count' => $count, 'data' => $data]);
     }
 

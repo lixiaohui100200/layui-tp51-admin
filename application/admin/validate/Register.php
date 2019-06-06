@@ -16,7 +16,7 @@ class Register extends Validate
         'username' => 'require',
         'phone' => 'require|mobile',
         'password' => 'require|length:6,12',
-        'repassword' => 'require|repeatPass'
+        'repassword' => 'require|confirm:password'
     ];
     
     /**

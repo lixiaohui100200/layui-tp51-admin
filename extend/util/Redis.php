@@ -4,15 +4,15 @@ use Config;
 use Exception;
 /**
  * Redis 连接
- * @author li shuaiqiu(asuma) 2018-12-21
- * @version beta 1.2 自动获取redis方法(重写了redis的部分方法)
+ * @author li shuaiqiu(asuma)
+ * @version beta 1.3 自动获取redis方法(重写了redis的部分方法)
  */
 class Redis{
 	static private $_connect; //redis实例对象
 	static private $ishold = 0; //是否为长连接 0 connect ; 1 pconnect
 	static private $config; //redis 相关配置
 
-	// 构造函数声明为private,防止直接创建对象
+	// 构造函数声明为private, 防止直接创建对象
 	private function __construct(){}
 
 	// 阻止用户复制对象实例
@@ -25,10 +25,10 @@ class Redis{
 	{
 		if(!isset(self::$config)){
 			$config = array(
-				'host' => Config::get('this.redis_host'),
-				'port' => Config::get('this.redis_port'),
-				'password' => Config::get('this.redis_password'),
-				'prefix' => Config::get('this.redis_prefix'),
+				'host' => Config::get('this.redis_host') ?: '127.0.0.1',
+				'port' => Config::get('this.redis_port') ?: '6379',
+				'password' => Config::get('this.redis_password') ?: '',
+				'prefix' => Config::get('this.redis_prefix') ?: '',
 				'hold' =>  Config::get('this.redis_hold') === true ? 'pconnect' : self::$ishold == 1 ? 'pconnect' : 'connect'
 			);
 
@@ -65,6 +65,14 @@ class Redis{
 	}
 
 	/**
+	 * 获取实际的redis缓存key
+	 */
+	static  public function getRedisKey($key)
+	{
+		return self::$config['prefix'].$key;
+	}
+
+	/**
 	 * 当调用本类的方法不存在时
 	 * @return 返回相应redis方法的结果
 	 */
@@ -97,7 +105,7 @@ class Redis{
 	 */
 	static public function exists($key) {
 		self::connection ();
-		$result = self::$_connect->exists(self::$config['prefix'].$key);
+		$result = self::$_connect->exists(self::getRedisKey($key));
 		return $result ? true : false;
 	}
 
@@ -124,7 +132,7 @@ class Redis{
 	static public function del($key)
 	{
 		self::connection();
-		return self::$_connect->del(self::$config['prefix'].$key);
+		return self::$_connect->del(self::getRedisKey($key));
 	}
 
 	/**
@@ -135,9 +143,9 @@ class Redis{
 	{
 		self::connection();
 		if ($expire > 0) {
-			return self::$_connect->setex(self::$config['prefix'].$key, $expire, $value);
+			return self::$_connect->setex(self::getRedisKey($key), $expire, $value);
 		} else {
-			return self::$_connect->set(self::$config['prefix'].$key, $value);
+			return self::$_connect->set(self::getRedisKey($key), $value);
 		}
 	}
 
@@ -148,7 +156,7 @@ class Redis{
 	static public function get($key)
 	{
 		self::connection();
-		return self::$_connect->get(self::$config['prefix'].$key);
+		return self::$_connect->get(self::getRedisKey($key));
 	}
 
 	/**
@@ -158,7 +166,7 @@ class Redis{
 	static public function hSet($key, $field, $value)
 	{
 		self::connection();
-		return self::$_connect->hSet(self::$config['prefix'].$key, $field, $value);
+		return self::$_connect->hSet(self::getRedisKey($key), $field, $value);
 	}
 
 	/**
@@ -168,7 +176,7 @@ class Redis{
 	static public function hGet($key, $field)
 	{
 		self::connection();
-		return self::$_connect->hGet(self::$config['prefix'].$key, $field);
+		return self::$_connect->hGet(self::getRedisKey($key), $field);
 	}
 
 	/**
@@ -178,7 +186,7 @@ class Redis{
 	static public function hmSet($key, $fvs=array())
 	{
 		self::connection();
-		return self::$_connect->hmSet(self::$config['prefix'].$key, $fvs);
+		return self::$_connect->hmSet(self::getRedisKey($key), $fvs);
 	}
 
 	/**
@@ -188,7 +196,7 @@ class Redis{
 	static public function hmGet($key, $fs=array())
 	{
 		self::connection();
-		return self::$_connect->hmSet(self::$config['prefix'].$key, $fs);
+		return self::$_connect->hmSet(self::getRedisKey($key), $fs);
 	}
 
 	/**
@@ -198,7 +206,7 @@ class Redis{
 	static public function hGetall($key)
 	{
 		self::connection();
-		return self::$_connect->hGetall(self::$config['prefix'].$key);
+		return self::$_connect->hGetall(self::getRedisKey($key));
 	}
 
 	/**
@@ -208,6 +216,6 @@ class Redis{
 	static public function hDel($key, $field)
 	{
 		self::connection();
-		return self::$_connect->hDel(self::$config['prefix'].$key, $field);
+		return self::$_connect->hDel(self::getRedisKey($key), $field);
 	}
 }

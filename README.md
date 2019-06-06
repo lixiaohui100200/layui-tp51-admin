@@ -1,5 +1,5 @@
 
-asuma-tp51-admin(又名udzanPro) 是基于 ThinkPHP 5.1 + Layui 开发的纯净的后台管理系统
+asuma-tp51-admin(又名udzanPro) 是基于 ThinkPHP 5.1 + Layui 开发的(纯净的)后台管理系统
 ===============
 
 优化或新增的功能：
@@ -15,7 +15,7 @@ asuma-tp51-admin(又名udzanPro) 是基于 ThinkPHP 5.1 + Layui 开发的纯净�
 
  使用本框架需提前准备以下环境：
 
- + php5.6以上。推荐使用`php7.1`
+ + php7.0以上。推荐使用`php7.1`
  + Mysql5.5以上。推荐使用`mysql5.7`
  + 除常用的php扩展外，还需安装php-redis扩展（必须，本系统多处使用到了redis作为数据存储）
 

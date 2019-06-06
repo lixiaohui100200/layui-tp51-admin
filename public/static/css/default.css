@@ -1,5 +1,8 @@
+/*** asuma 定制主题css ***/
+
 .layadmin-side-shrink .layui-layout-admin .layui-logo{width: 60px;background-image:url(../images/logo.png);}
 .layui-btn{border-radius:3px;}
+.layui-btn-radius{border-radius:100px;}
 .layui-laypage-em{border-radius:3px;}
 .layui-label-asuma{width: auto;}
 .asuma-form-item label{width: 60px;}
@@ -19,6 +22,11 @@
 .layui-form-checked[lay-skin="primary"] i{border-color:#409EFF;background-color:#409EFF;}
 .layui-form-checkbox[lay-skin="primary"]:hover i{border-color:#409EFF;}
 .layui-form-select dl dd.layui-this{background-color:#409EFF;}
+.layui-form-radio > i:hover, .layui-form-radioed > i{color:#409EFF;}
+.layui-form-onswitch{border-color:#409EFF;background-color:#409EFF;}
+.layui-form-checked span, .layui-form-checked:hover span{background-color:#409EFF;}
+.layui-form-checkbox[lay-skin="primary"] span{background: 0 0;}
+.layui-form-checked i, .layui-form-checked:hover i{color:#409EFF;}
 
 /*layer*/
 .asuma-layer .layui-layer-btn0{background-color:#338fe5;border-color:#338fe5;}

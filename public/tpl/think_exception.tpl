@@ -412,7 +412,8 @@
     <div class="copyright">
         <a title="阿斯玛的博客" href="http://www.udzan.com">阿斯玛的udzanPro</a> 
         <span>V1.0.0</span> 
-        <span>基于 ThinkPHP 5.1 + Layui 开发的后台管理系统</span>
+        <span>让美好变得更好</span>
+        <span>Time: <?php echo date('Y-m-d H:i:s') ?></span>
     </div>
     <?php if(\think\facade\App::isDebug()) { ?>
     <script>
