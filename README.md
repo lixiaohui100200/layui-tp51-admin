@@ -1,5 +1,5 @@
 
-asuma-tp51-admin(又名udzanPro) 是基于 ThinkPHP 5.1 + Layui 开发的(纯净的)后台管理系统
+iAsuma/layui-tp51-admin(又名QingCMS，轻CMS) 是基于 ThinkPHP 5.1 + Layui 开发的(纯净的)后台管理系统
 ===============
 
 优化或新增的功能：
@@ -15,8 +15,9 @@ asuma-tp51-admin(又名udzanPro) 是基于 ThinkPHP 5.1 + Layui 开发的(纯净
 
  使用本框架需提前准备以下环境：
 
- + php7.0以上。推荐使用`php7.1`
- + Mysql5.5以上。推荐使用`mysql5.7`
+ + php7.0以上
+ + Mysql5.7以上
+ + Redis
  + 除常用的php扩展外，还需安装php-redis扩展（必须，本系统多处使用到了redis作为数据存储）
 
 ## 安装步骤
@@ -24,7 +25,7 @@ asuma-tp51-admin(又名udzanPro) 是基于 ThinkPHP 5.1 + Layui 开发的(纯净
 1.git下载项目源文件
 
 ~~~
-git clone http://gitlab.weijin365.com/lisq/asuma-tp51-beta.git my-project(项目名称自定义)
+git clone https://github.com/iAsuma/layui-tp51-admin.git my-project(项目名称自定义)
 ~~~
 
 2.使用Composer安装thinkphp框架以及依赖库

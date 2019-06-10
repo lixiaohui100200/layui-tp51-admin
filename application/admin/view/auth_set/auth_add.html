@@ -1,0 +1,243 @@
+{extend name="public/original" /}
+{block name="title"}添加权限{/block}
+{block name="css"}
+<style type="text/css">
+  .layui-input-inline{width: 260px !important;}
+</style>
+{/block}
+{block name="content"}
+<div class="layui-form" lay-filter="filter-form-auth" id="form-auth" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+      <label class="layui-form-label">权限名</label>
+      <div class="layui-input-inline">
+        <input type="text" name="authtitle" lay-verType="tips" lay-verify="required" placeholder="请输入权限名称" autocomplete="off" class="layui-input" >
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">权限类型</label>
+      <div class="layui-input-inline">
+        <select name="type" lay-verType="tips" lay-verify="required" lay-filter="typeSel">
+          <option value="">选择一个类型</option>
+          <option value="1">模块</option>
+          <option value="2">子模块</option> <!-- 一般用于左侧有三级菜单的情况，可去掉disabled -->
+          <option value="3">节点</option>
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item" id="fatherMod" style="display: none;">
+      <label class="layui-form-label">所属上级</label>
+      <div class="layui-input-inline">
+        <select name="pId" class="fathersel" lay-verType="tips" lay-filter="fathersel" lay-verify="pidneed">
+          <option></option>
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">权限标识</label>
+      <div class="layui-input-inline">
+        <input type="text" name="authname" lay-verType="tips" lay-verify="required" placeholder="请输入标识" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">表现类型</label>
+      <div class="layui-input-inline">
+        <input type="radio" name="run_type" value="1" title="普通" lay-filter="runTypeSel" checked="">
+        <input type="radio" name="run_type" value="2" title="异步" lay-filter="runTypeSel">
+      </div>
+    </div>
+    <div class="layui-form-item" id="menuCtl">
+      <label class="layui-form-label">设为菜单</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" lay-filter="menuSwt" name="is_menu" lay-skin="switch" lay-text="是|否" value="1">
+      </div>
+    </div>
+    <div class="layui-form-item" id="iconCtl" style="display: none;">
+      <label class="layui-form-label">图标</label>
+      <div class="layui-input-block">
+        <input type="text" id="iconPicker" lay-verify="Menu" lay-filter="iconPicker" name="icon" value="">
+      </div>
+    </div>
+    <div class="layui-form-item" id="weight" style="display: none;">
+      <label class="layui-form-label">权重</label>
+      <div class="layui-input-inline">
+        <input type="text" name="sorted" class="layui-input" value="0" lay-verify="number">
+      </div>
+    </div>
+    <div class="layui-form-item" id="logCtl" style="display: none;">
+      <label class="layui-form-label">记录日志</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" name="is_log" lay-skin="switch" lay-text="是|否" value="1">
+      </div>
+      <div class="layui-form-mid layui-word-aux">请在需要记录日志的行为时再开启</div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">权限描述</label>
+      <div class="layui-input-block" >
+        <textarea placeholder="对权限的描述或者记录日志的行为描述" class="layui-textarea" name="desc" lay-verType="tips" lay-verify="descNeed"></textarea>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">状态</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" name="status" lay-skin="switch" lay-text="正常|关闭" value="1">
+      </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+      <input type="hidden" name="{:config('this.form_token')}" value="{$Request.token}" />
+      <input type="button" lay-submit lay-filter="auth-submit" id="auth-submit" value="确认">
+    </div>
+  </div>
+{/block}
+{block name="footjs"}
+<script id="treeMods" type="text/html">
+  <option></option>
+  {{# layui.each(d, function(i, t){ }}
+    <option value="{{t.id}}">{{t.title}} ({{t.name}})</option>
+    {{# if(t.child){ }}
+      {{# layui.each(t.child, function(ii, tt){ }}
+        <option value="{{tt.id}}">&nbsp;&nbsp;└&nbsp;{{tt.title}} ({{tt.name}})</option>
+      {{# }); }}
+    {{# } }}
+  {{# }); }}
+</script>
+<script>
+
+  layui.config({
+    base: '__JS__/layuiext/' //静态资源所在路径
+  }).use(['form', 'laytpl', 'iconPicker'], function(){
+    var form = layui.form 
+    ,laytpl = layui.laytpl
+    ,iconPicker = layui.iconPicker;
+
+    iconPicker.render({
+        // 选择器，推荐使用input
+        elem: '#iconPicker',
+        // 数据类型：fontClass/unicode，推荐使用fontClass
+        type: 'fontClass',
+        // 是否开启搜索：true/false，默认true
+        search: false,
+        // 是否开启分页：true/false，默认true
+        page: true,
+        // 每页显示数量，默认12
+        limit: 20,
+        cellWidth: '20%',
+        // 点击回调
+        click: function (data) {
+            //console.log(data);
+        },
+        // 渲染成功后的回调
+        success: function(d) {
+            //console.log(d);
+        }
+    });
+
+    form.on('select(typeSel)', function(data){
+      if(data.value != "" && data.value != 1){
+        $('#fatherMod').show();
+      }else{
+        $('#fatherMod').hide();
+        $('.fathersel').html('<option></option>');
+        form.render('select');
+        return false;
+      }
+      
+      $.post("{:url('modsTree')}", {type:data.value}, function(data){
+        let getTpl = $('#treeMods').html()
+        laytpl(getTpl).render(data, function(html){
+          $('.fathersel').html(html);
+          form.render('select');
+
+          /** 修改select内部样式 **/
+          $('.fathersel').next().children('dl').children('dd').each(function() {
+            let str = $(this).html()
+            let arr = str.split('(');
+            if(arr.length == 2){
+              arr[1] = '<span style="color:#D2D2D2;">(' + arr[1] + '</span>';
+              $(this).html(arr.join(''))
+            }
+          })
+        });
+      })
+    })
+
+    /** 去掉select选中值空格以及制表符 **/
+    form.on('select(fathersel)', function(data){
+      var valueStr = data.othis.find('input').val()
+      var value = valueStr.replace(/(└)|(\s*)/g, '');
+      data.othis.find('input').val(value)
+    })
+
+    form.on('radio(runTypeSel)', function(data){
+      if(data.value == 2){
+        $('#menuCtl').hide();
+        $('input[name=is_menu]').prop('checked', false);
+        $('#weight').hide();
+        $('#iconCtl').hide();
+        iconPicker.checkIcon('iconPicker', '');
+        $('#logCtl').show();
+      }else{
+        $('#menuCtl').show();
+        $('#logCtl').hide();
+        $('input[name=is_log]').prop('checked', false);
+      }
+
+      form.render('checkbox');
+    })
+
+    form.on('switch(menuSwt)', function(data){
+      $('input[name=sorted]').val(0);
+      $('input[name=icon]').val('');
+      iconPicker.checkIcon('iconPicker', '');
+      if(data.elem.checked){
+        $('#iconCtl').show();
+        $('#weight').show();
+      }else{
+        $('#iconCtl').hide();
+        $('#weight').hide();
+      }
+    })
+
+    form.verify({
+      pidneed: function(value, item){
+        if(!$(item).parents('.layui-form-item').is(':hidden') && !value){
+          return '请选择该权限所属上级';
+        }
+      }
+      ,Menu: function(value, item){
+        if($('input[name=is_menu]').prop('checked') && !$.trim(value)){
+          return '请给菜单选择一个图标';
+        }
+      }
+      ,descNeed: function(value, item){
+        if($('input[name=is_log]').prop('checked') && !$.trim(value)){
+          return '开启记录日志时权限描述为必填项';
+        }
+      }
+    })
+
+    //监听提交
+    form.on('submit(auth-submit)', function(data){
+      var field = data.field; //获取提交的字段
+      var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引  
+
+      //提交 Ajax 成功后，关闭当前弹层并重载表格
+      $.post("{:url('pullRule')}", data.field, function(res){
+        if(res.code == 1){
+          parent.$('input[name=is_menu]').attr('checked', false);
+          parent.$('input[name=title]').val('');
+          parent.$('input[name=name]').val('');
+          parent.layui.form.render('checkbox')
+
+          parent.layui.table.reload('udzan-rule',{
+            where: {is_menu: null, title: null, name : null}
+            ,page:{curr:1}
+          }); //重载表格
+          parent.layer.close(index); //再执行关闭 
+        }else{
+          layer.msg(res.result, {icon: 5});
+        }
+      },'json');
+    });
+  })
+</script>
+{/block}

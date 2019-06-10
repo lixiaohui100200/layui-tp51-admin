@@ -72,6 +72,11 @@
       ,url: "{:url('adminList')}" //数据接口
       ,page: true //开启分页
       ,limits:[10,15,20]
+      ,done:function (res, curr, count) {
+        if(count <= this.limit){
+          $('.layui-table-page').addClass('layui-hide');//总条数小于每页限制条数时隐藏分页
+        }
+      }
       ,cols: [[ //表头
         {field: 'id', title: 'ID',  sort: true, width:65}
         ,{field: 'login_name', title: '用户名'}
@@ -114,20 +119,22 @@
           ,btn: ['确定', '取消']
           ,yes: function(index, layero){
             var iframeWindow = window['layui-layer-iframe'+ index]
-            ,submitID = 'LAY-user-back-submit'
-            ,laySubmitId = 'LAY-user-front-submit'
+            ,submitID = 'asuma-admin-submit'
             ,submit = layero.find('iframe').contents().find('#'+ submitID);
 
             //监听提交
-            iframeWindow.layui.form.on('submit('+ laySubmitId +')', function(data){
+            iframeWindow.layui.form.on('submit('+ submitID +')', function(data){
               var field = data.field; //获取提交的字段
               
               //提交 Ajax 成功后，静态更新表格中的数据
-              $.post("{:url('pulladmin')}", field, function(data){
-                console.log(data);
+              $.post("{:url('pulladmin')}", field, function(res){
+                if(res.code == 1){
+                  table.reload('udzan-admin'); //数据刷新
+                  layer.close(index); //关闭弹层
+                }else{
+                  layer.msg(res.result, {icon: 5});
+                }
               })
-              // table.reload('LAY-user-front-submit'); //数据刷新
-              // layer.close(index); //关闭弹层
               
             });  
             

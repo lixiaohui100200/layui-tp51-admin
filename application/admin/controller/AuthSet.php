@@ -44,6 +44,15 @@ class AuthSet extends Base
                     'create_time' => time(),
                     'create_by' => 0
                 ];
+
+                $whereor = [
+                    'login_name' => $data['login_name'],
+                    'email' => $data['email'],
+                    'phone' => $data['phone']
+                ];
+
+                $loginUser = Db::table('admin_user')->field('id,name,login_name,phone,email,password,head_img,status')->whereOr($whereor)->fetchSql(true)->where('status' ,'<>', -1)->select();
+                dump($loginUser);die;
                 
                 $result = Db::table('admin_user') -> insert($data);
                 !$result && exit(res_json_native(-3, '添加失败'));
@@ -117,7 +126,7 @@ class AuthSet extends Base
         return table_json($list, count($modsTree));
     }
 
-    public function authEdit()
+    public function authAdd()
     {
         return $this->fetch();
     }
@@ -158,6 +167,7 @@ class AuthSet extends Base
                 'sorted' => (int)$post['sorted'],
                 'pid' => (int)$post['pId'],
                 'is_menu' => $post['is_menu'] ?? 0,
+                'icon' => $post['icon'] ?? '',
                 'is_logged' => $post['is_log'] ?? 0,
                 'remark' => off_xss(trim($post['desc']))
             ];
@@ -225,14 +235,15 @@ class AuthSet extends Base
         $cacheKey= md5('user_'.$uid);
         $uid && $user = Db::table('admin_user')->where('id', '=', $uid)->cache($cacheKey, 86400, 'admin_user')->find();
         empty($user) && exit(res_json_native(-1, '用户信息获取失败，请重新登录'));
-
-        $user['password'] != md5safe($pwd) && exit(res_json_native(-2, '密码错误'));
         
         switch ($this->request->post('status')) {
             case 'true':
                 $status = 1;
                 break;
             case 'delete':
+                $user['password'] != md5safe($pwd) && exit(res_json_native(-2, '密码错误'));
+                $info = Db::table('auth_rule')->field('id,name')->where('pid' , $id)->select();
+                !empty($info) && exit(res_json_native(-2, '请先删除子权限'));
                 $status = -1;
                 break;
             default:
@@ -251,5 +262,56 @@ class AuthSet extends Base
         \think\facade\Cache::clear('auth_rule'); //清除规则缓存，让列表实时生效
 
         return res_json(1);
+    }
+
+    public function authEdit()
+    {
+        $id = (int)$this->request->get('rule');
+        $id && $info = Db::table('auth_rule')->where(['id' => $id])->find();
+
+        isset($info) && $this->assign('info', $info);
+        
+        return $this->fetch();
+    }
+
+    public function editRule(Request $request)
+    {
+        try {
+            $post = $request->post();
+            !checkFormToken($post) && exit(res_json_native('-2', '请勿重复提交'));
+
+            $data = [
+                'title' => off_xss(trim($post['authtitle'])),
+                'status' => $post['status'] ?? -2,
+                'sorted' => (int)$post['sorted'],
+                'is_menu' => $post['is_menu'] ?? 0,
+                'icon' => $post['icon'] ?? '',
+                'is_logged' => $post['is_log'] ?? 0,
+                'remark' => off_xss(trim($post['desc']))
+            ];
+
+            $validate = \think\Validate::make([
+                'title' => 'require|max:30',
+                'remark' => 'max:200',
+            ],[
+                'title.require'=> '请填写权限名',
+                'title.max'    => '权限名最多不能超过30个字符',
+                'remark'       => '描述最多不能超过200个字符',
+            ]);
+
+            if(!$validate->check($data)){
+                return res_json(-3, $validate->getError());
+            }
+
+            $result = Db::table('auth_rule')->where('id', (int)$post['rule_id'])->update($data);
+            !$result && exit(res_json_native(-1, '修改失败'));
+
+            destroyFormToken($post);
+            \think\facade\Cache::clear('auth_rule'); //清除规则缓存，让列表实时生效
+            return res_json(1);
+        } catch (\Exception $e) {
+            return res_json(-100, $e->getMessage());
+        }
+        
     }
 }

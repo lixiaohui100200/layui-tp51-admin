@@ -76,7 +76,6 @@
 
     var tableIns = table.render({
       elem: '#udzan-rule'
-      ,id: 'pmlist'
       ,url: "{:url('permissionsList')}" //数据接口
       ,page: true //开启分页
       ,limit:20
@@ -219,8 +218,8 @@
     table.on('tool(udzan-rule)', function(obj){
       if(obj.event == 'del'){
         active['del'].call(this, obj);
-      }else if(obj.event == 'weightchange'){
-        console.log(obj)
+      }else if(obj.event == 'edit'){
+        active['edit'].call(this, obj);
       }
     })
     
@@ -229,7 +228,7 @@
         layer.open({
           type: 2
           ,title: '添加权限'
-          ,content: "{:url('authEdit')}"
+          ,content: "{:url('authAdd')}"
           ,maxmin: true
           ,area: ['820px', '600px']
           ,btn: ['确定', '取消']
@@ -240,12 +239,39 @@
           }
         });
       }
+      ,edit: function(obj){
+        layer.open({
+          type: 2
+          ,title: '编辑权限'
+          ,content: "{:url('authEdit')}?rule="+obj.data.id
+          ,maxmin: true
+          ,area: ['820px', '560px']
+          ,btn: ['确定', '取消']
+          ,success: function(layero, index){
+            layero.find('input[name=rule_id]').val(obj.data.id)
+          }
+          ,yes: function(index, layero){
+            //点击确认触发 iframe 内容中的按钮提交
+            var submit = layero.find('iframe').contents().find("#auth-submit");
+            submit.click();
+          }
+        });
+      }
       ,del: function(obj){
-        layer.prompt({title: '请输入密码', formType: 1},function(value, index, elem){
+        layer.prompt({
+          title: '<span style="color:red;font-weight:bold;font-size:15px;">删除后不可恢复</span>'
+          ,formType: 1
+          ,success:function(layero){
+            layero.find('input').attr('placeholder', '请输入密码')
+        }},function(value, index, elem){
           $.post("{:url('changeRuleStatus')}",{id:obj.data.id, status: 'delete', password: value}, function(res){
             if(res.code == 1){
               layer.close(index)
               tableIns.reload()
+            }else if(res.code == -2){
+              layer.msg(res.result, {time:1500},function(){
+                layer.close(index)
+              });
             }else{
               layer.msg(res.result);
             }

@@ -1,5 +1,5 @@
 {extend name="public/original" /}
-{block name="title"}udzanPro - 添加管理员{/block}
+{block name="title"}添加管理员{/block}
 {block name="content"}
 <div class="layui-form" lay-filter="layuiadmin-form-admin" id="layuiadmin-form-admin" style="padding: 20px 30px 0 0;">
     <div class="layui-form-item">
@@ -9,9 +9,9 @@
       </div>
     </div>
     <div class="layui-form-item">
-      <label class="layui-form-label">用户名</label>
+      <label class="layui-form-label">姓名</label>
       <div class="layui-input-inline">
-        <input type="text" name="username" lay-verType="tips" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+        <input type="text" name="username" lay-verType="tips" placeholder="请输入姓名" autocomplete="off" class="layui-input">
       </div>
     </div>
     <div class="layui-form-item">
@@ -50,7 +50,7 @@
     </div>
     <div class="layui-form-item layui-hide">
       <input type="hidden" name="{:config('this.form_token')}" value="{$Request.token}" />
-      <input type="button" lay-submit lay-filter="LAY-user-front-submit" id="LAY-user-back-submit" value="确认">
+      <input type="button" lay-submit lay-filter="asuma-admin-submit" id="asuma-admin-submit" value="确认">
     </div>
   </div>
 {/block}
