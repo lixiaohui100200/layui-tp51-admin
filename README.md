@@ -1,5 +1,5 @@
 
-iAsuma/layui-tp51-admin(又名QingCMS，轻CMS) 是基于 ThinkPHP 5.1 + Layui 开发的(纯净的)后台管理系统
+iAsuma/layui-tp51-admin(又名QingCMS，轻CMS) 纯净轻盈的后台管理系统
 ===============
 
 优化或新增的功能：
@@ -10,7 +10,6 @@ iAsuma/layui-tp51-admin(又名QingCMS，轻CMS) 是基于 ThinkPHP 5.1 + Layui �
 
 内置扩展：
 
- + 集成阿里短信SDK
  + 集成微信开发SDK -- EasyWeChat（[手册传送门](https://www.easywechat.com/docs/master/overview)）
 
  使用本框架需提前准备以下环境：
@@ -25,7 +24,7 @@ iAsuma/layui-tp51-admin(又名QingCMS，轻CMS) 是基于 ThinkPHP 5.1 + Layui �
 1.git下载项目源文件
 
 ~~~
-git clone https://github.com/iAsuma/layui-tp51-admin.git my-project(项目名称自定义)
+git clone https://github.com/iAsuma/layui-tp51-admin.git my-project
 ~~~
 
 2.使用Composer安装thinkphp框架以及依赖库
@@ -41,19 +40,33 @@ composer install
 cp .env.example .env
 ~~~
 
-4.加载手动引入的第三方类库（可跳过，如果手动引入的类库无法加载时执行）
-~~~
-composer dump-autoload
-~~~
-
-5.更新Thinkphp框架（如果需要最新的thinkphp时执行）
+4.修改.env环境变量配置文件
 
 ~~~
-composer update topthink/framework
+vi .env #根据项目实际情况进行修改
+~~~
+
+5.完成。 根据自身情况部署web环境
+
+~~~
+http://your-domain.com/admin
 ~~~
 
 > 使用本系统默认视为已熟悉PHP Web开发，熟悉Thinkphp5.1，熟悉LNMP开发项目，请自行部署Web访问环境
 > 安装后请使用域名访问本系统，或者放在Web环境根目录
+
+## other
+
+1.加载手动引入的第三方类库（如果部分引入的类库无法加载时执行）
+~~~
+composer dump-autoload
+~~~
+
+2.更新Thinkphp框架（如果需要最新的thinkphp时执行）
+
+~~~
+composer update topthink/framework
+~~~
 
 ## 作者
 

@@ -48,9 +48,6 @@
 </div>
 {/block}
 {block name="footjs"}
-<script type="text/html" id="menuTpl">
-  <input type="checkbox" name="is_menu" value="{{d.is_menu}}" lay-skin="switch" lay-text="是|否" {{d.is_menu == 1 ? 'checked' : ''}}>
-</script>
 <script type="text/html" id="loggedTpl">
   {{# if(d.run_type == 2){ }}
   <input type="checkbox" name="is_logged" value="{{d.id}}" lay-filter="logSwitch" lay-skin="switch" lay-text="是|否" {{d.is_logged == 1 ? 'checked' : ''}}>
@@ -86,7 +83,7 @@
         }
       }
       ,cols: [[ //表头
-      	{field: 'title', title: '名称', minWidth : '140',templet: function(d){
+      	{field: 'title', title: '名称', minWidth : '140', templet: function(d){
           var str = '';
           switch(d.level){
             case 1: 
@@ -134,7 +131,7 @@
         ,{field: 'sorted', title: '权重', edit : 'text'}
         ,{field: 'is_logged', title: '记录日志', templet:"#loggedTpl"}
         ,{field: 'status', title: '状态', templet: '#statusTpl'}
-        ,{title: '操作',toolbar: '#optTpl'}
+        ,{title: '操作', toolbar: '#optTpl'}
       ]]
     });
 
@@ -277,7 +274,6 @@
             }
           }, 'json')
         });
-        
       }
     };
 

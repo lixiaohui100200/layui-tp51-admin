@@ -12,7 +12,6 @@ class Base extends Controller
         // echo "init ";
     }
 
-
     public function parseWhere($where): array
     {
         unset($where['limit']);

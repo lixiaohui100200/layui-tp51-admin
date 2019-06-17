@@ -94,17 +94,20 @@ class Auth{
      *     array('uid'=>'用户id','group_id'=>'用户组id','title'=>'用户组名称','rules'=>'用户组拥有的规则id,多个,号隔开'),
      *     ...)
      */
-    public function getGroups($uid) {
+    public function getGroups($uid, $mark=1) {
         static $groups = array();
 
         if (isset($groups[$uid])) return $groups[$uid];
 
+        $cacheKey = 'group_'.$mark.'_'.$uid;
         $user_groups = \think\Db::name($this->_config['auth_group_access'])
             ->alias('a')
             ->join($this->_config['auth_group']." g", "g.id=a.group_id")
             ->where("a.uid='$uid' and g.status='1'")
-            ->field('uid,group_id,title,rules')->select();
-
+            ->field('uid,group_id,title,rules')
+            ->cache($cacheKey, 30*24*60*60, 'admin_role')
+            ->select();
+            
         $groups[$uid] = $user_groups ? $user_groups : [];
 
         return $groups[$uid];
@@ -126,7 +129,7 @@ class Auth{
         }
 
         //读取用户所属用户组
-        $groups = $this->getGroups($uid);
+        $groups = $this->getGroups($uid, $mark);
         $ids = array();//保存用户所属用户组设置的所有权限规则id
         foreach ($groups as $g) {
             $ids = array_merge($ids, explode(',', trim($g['rules'], ',')));
@@ -141,9 +144,10 @@ class Auth{
             ['id', 'in', $ids],
             ['status', '=', 1]
         ];
-        
+
+        $cacheKey = 'rule'.$mark.'_'.md5(http_build_query($map));
         //读取用户组所有权限规则
-        $rules = \think\Db::name($this->_config['auth_rule'])->where($map)->field('condition,name')->select();
+        $rules = \think\Db::name($this->_config['auth_rule'])->field('condition,name')->cache($cacheKey, 30*24*60*60, 'auth_rule')->where($map)->select();
 
         //循环规则，判断结果。
         $authList = array();
@@ -178,7 +182,7 @@ class Auth{
         static $userinfo = array();
 
         if(!isset($userinfo[$uid])){
-             $userinfo[$uid] = \think\Db::name($this->_config['auth_user'])->where(array('id' => $uid))->find();
+            $userinfo[$uid] = \think\Db::name($this->_config['auth_user'])->where(array('id' => $uid))->find();
         }
 
         return $userinfo[$uid];

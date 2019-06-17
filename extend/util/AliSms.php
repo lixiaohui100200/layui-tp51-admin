@@ -1,5 +1,5 @@
 <?php
-namespace this;
+namespace util;
 use Aliyun\Core\Config;
 use Aliyun\Core\Profile\DefaultProfile;
 use Aliyun\Core\DefaultAcsClient;

@@ -27,7 +27,7 @@
     <div class="layui-form-item" id="fatherMod" style="display: none;">
       <label class="layui-form-label">所属上级</label>
       <div class="layui-input-inline">
-        <select name="pId" class="fathersel" lay-verType="tips" lay-filter="fathersel" lay-verify="pidneed">
+        <select name="pId" class="fathersel" lay-verType="tips" lay-filter="fathersel" lay-verify="pidneed" lay-search>
           <option></option>
         </select>
       </div>
@@ -92,10 +92,10 @@
 <script id="treeMods" type="text/html">
   <option></option>
   {{# layui.each(d, function(i, t){ }}
-    <option value="{{t.id}}">{{t.title}} ({{t.name}})</option>
+    <option value="{{t.id}}" data-l="1">{{t.title}} ({{t.name}})</option>
     {{# if(t.child){ }}
       {{# layui.each(t.child, function(ii, tt){ }}
-        <option value="{{tt.id}}">&nbsp;&nbsp;└&nbsp;{{tt.title}} ({{tt.name}})</option>
+        <option value="{{tt.id}}" data-l="2">└ {{tt.title}} ({{tt.name}})</option>
       {{# }); }}
     {{# } }}
   {{# }); }}
@@ -148,12 +148,15 @@
           form.render('select');
 
           /** 修改select内部样式 **/
-          $('.fathersel').next().children('dl').children('dd').each(function() {
-            let str = $(this).html()
+          $('.fathersel').next().children('dl').children('dd').each(function(i, e) {
+            let str = $(e).html()
             let arr = str.split('(');
             if(arr.length == 2){
               arr[1] = '<span style="color:#D2D2D2;">(' + arr[1] + '</span>';
-              $(this).html(arr.join(''))
+              $(e).html(arr.join(''))
+            }
+            if($('.fathersel>option:eq('+i+')').data('l') == 2){
+              $(e).css('padding-left', '20px');
             }
           })
         });

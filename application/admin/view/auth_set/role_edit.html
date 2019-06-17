@@ -1,0 +1,120 @@
+{extend name="public/original" /}
+{block name="title"}编辑角色{/block}
+{block name="css"}
+<link rel="stylesheet" type="text/css" href="__JS__/layuiext/eleTree/eleTree.css">
+<link rel="stylesheet" type="text/css" href="__CSS__/authtree.css">
+{/block}
+{block name="content"}
+<div class="layui-form" lay-filter="filter-form-auth" id="form-auth" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+      <label class="layui-form-label">角色名</label>
+      <div class="layui-input-inline">
+        <input type="text" name="rolename" lay-verType="tips" lay-verify="required" placeholder="请输入角色名" autocomplete="off" class="layui-input" value="{$role.title}">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">规则</label>
+      <div class="layui-input-block" >
+        <input type="checkbox" name="" title="全选" lay-skin="primary" lay-filter="allcheck">
+      </div>
+      <div class="layui-input-block" >
+        <div id="tree_node"></div>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">描述</label>
+      <div class="layui-input-block" >
+        <textarea placeholder="" class="layui-textarea" name="desc" lay-verType="tips" lay-verify="descNeed">{$role.remark}</textarea>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">状态</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" name="status" lay-skin="switch" lay-text="开启|关闭" value="1" {if $role.status == 1}checked{/if}>
+      </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+      <input type="hidden" name="role_id" value="{$role.id}" />
+      <input type="hidden" name="{:config('this.form_token')}" value="{$Request.token}" />
+      <input type="button" lay-submit lay-filter="role-submit" id="role-submit" value="确认">
+    </div>
+  </div>
+{/block}
+{block name="footjs"}
+<script>
+  layui.config({
+    base: '__JS__/layuiext/' //静态资源所在路径
+  }).extend({
+    eleTree: 'eleTree/eleTree'
+  }).use(['form', 'eleTree'], function(){
+    var form = layui.form
+    ,eleTree = layui.eleTree
+
+    var tree = eleTree.render({
+      elem: '#tree_node'
+      ,url:"{:url('rulesChecked')}"
+      ,where:{
+        rules: "{$role.rules}"
+      }
+      ,showCheckbox:true
+      ,renderAfterExpand : false
+      ,request:{
+        name: 'title'
+        ,children: 'child'
+      }
+      ,done:function(res) {
+        var rules = res.data
+        for (var i = 0; i < rules.length; i++) {
+          if(rules[i]['type'] != 3 && !rules[i].hasOwnProperty('child')){
+            rules[i]['disabled'] = true
+            tree.updateKeySelf(rules[i]['id'], rules[i]);
+          }else{
+            for (var j = 0; j < rules[i]['child'].length; j++) {
+              if (rules[i]['child'][j]['type'] != 3 && !rules[i]['child'][j].hasOwnProperty('child')) {
+                rules[i]['child'][j]['disabled'] = true
+                tree.updateKeySelf(rules[i]['child'][j]['id'], rules[i]['child'][j]);
+              }
+            }  
+          }
+        }
+      }
+    })
+
+    form.on('checkbox(allcheck)', function(res){
+      if(res.elem.checked == true){
+        var ruleArr = tree.getAllNodeData()
+        var ruleIs = []
+        for (var i = 0; i < ruleArr.length; i++) {
+          ruleIs[i] = ruleArr[i].id
+        }
+        tree.setChecked(ruleIs)
+      }else{
+        tree.unCheckNodes();
+      }
+    })
+
+    //监听提交
+    form.on('submit(role-submit)', function(data){
+      var field = data.field; //获取提交的字段
+      var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+      var ruleIs = []
+
+      var ruleArr = tree.getChecked(false, true)
+      for (var i = 0; i < ruleArr.length; i++) {
+        ruleIs[i] = ruleArr[i].id
+      }
+      field.rules = ruleIs;
+      
+      //提交 Ajax 成功后，关闭当前弹层并重载表格
+      $.post("{:url('addNewRole')}", data.field, function(res){
+        if(res.code == 1){
+          parent.layui.table.reload('udzan-role',{page:{curr:1}}); //重载表格
+          parent.layer.close(index); 
+        }else{
+          layer.msg(res.result, {icon: 5});
+        }
+      },'json');
+    });
+  })
+</script>
+{/block}

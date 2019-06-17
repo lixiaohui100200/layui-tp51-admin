@@ -3,7 +3,7 @@ namespace app\index\controller;
 use Config;
 use think\Request;
 use util\Redis;
-use this\AliSms;
+use util\AliSms;
 
 class Through
 {

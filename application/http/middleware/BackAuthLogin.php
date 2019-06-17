@@ -49,10 +49,10 @@ class BackAuthLogin
     	}else{
             $userInfo = Session::get(config('auth_key'));
             $node = $request->controller().'/'.$request->action();
-
+            
             // 权限检测
             if(!Permissions::check($node, $userInfo['uid'])){
-                // return view('/public/error', ['icon' => '#xe6af', 'error' => '没有权限访问哦']);
+                return view('/public/error', ['icon' => '#xe6af', 'error' => '没有权限访问哦']);
             }
 
             $request->uid = $userInfo['uid'];

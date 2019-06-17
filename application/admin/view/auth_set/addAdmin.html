@@ -1,5 +1,11 @@
 {extend name="public/original" /}
 {block name="title"}添加管理员{/block}
+{block name="css"}
+<link rel="stylesheet" type="text/css" href="__JS__/layuiext/formSelects/formSelects-v4.css">
+<style type="text/css">
+  .xm-select-tips{display: none;}
+</style>
+{/block}
 {block name="content"}
 <div class="layui-form" lay-filter="layuiadmin-form-admin" id="layuiadmin-form-admin" style="padding: 20px 30px 0 0;">
     <div class="layui-form-item">
@@ -35,10 +41,11 @@
     <div class="layui-form-item">
       <label class="layui-form-label">角色</label>
       <div class="layui-input-inline">
-        <select name="role" lay-verType="tips" lay-verify="required">
-          <option value="">请选择</option>
-          <option disabled="">超级管理员</option>
-          <option value="1">管理员</option>
+        <select name="roles" lay-verType="tips" lay-verify="required" xm-select="roleSel" xm-select-skin="normal" xm-select-max="4">
+          <option value="">最多选四个</option>
+          {volist name="roles" id="vo"}
+          <option value="{$vo.id}" {if $vo.id == 1}disabled{/if} >{$vo.title}</option>
+          {/volist}
         </select>
       </div>
     </div>
@@ -56,8 +63,16 @@
 {/block}
 {block name="footjs"}
 <script>
-  layui.use(['form'], function(){
-    var form = layui.form ;
+  layui.config({
+    base: '__JS__/layuiext/' //静态资源所在路径
+  }).extend({
+    formSelects: 'formSelects/formSelects-v4'
+  }).use(['form', 'formSelects'], function(){
+    var form = layui.form
+    ,formSelects = layui.formSelects;
+
+    // formSelects.render('selectId');
+
     form.verify({
       adminPhone:function(value, item){
         if(!value && !$('input[name="email"]').val()){

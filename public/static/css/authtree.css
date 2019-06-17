@@ -1,0 +1,7 @@
+/*eleTree 样式 重写*/
+.eleTree-checkbox{min-height: 14px;}
+.eleTree-checkbox i{width: 16px;height: 16px;line-height: 16px;font-size: 14px}
+.eleTree-checkbox-checked i{background-color: #409EFF;border-color: #409EFF;}
+.eleTree-checkbox i:hover{border-color: #409EFF;}
+.eleTree-node-content{height: 28px;line-height: 1.5;}
+.eleTree-node-content-label{padding-left: 8px;}

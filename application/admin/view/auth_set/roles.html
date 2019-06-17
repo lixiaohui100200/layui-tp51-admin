@@ -1,33 +1,17 @@
 {extend name="public/base" /}
 {block name="title"}角色管理{/block}
+{block name="css"}
+<style type="text/css">
+  .status-btn{cursor: not-allowed;}
+</style>
+{/block}
 {block name="content"}
   <div class="layui-fluid">   
     <div class="layui-card">
-      <div class="layui-form layui-card-header layuiadmin-card-header-auto">
-        <div class="layui-form-item asuma-form-item">
-          <div class="layui-inline">
-            <label class="layui-form-label">角色筛选</label>
-            <div class="layui-input-inline">
-              <select name="rolename" lay-filter="LAY-user-adminrole-type">
-                <option value="-1">全部角色</option>
-                <option value="0">管理员</option>
-                <option value="1">超级管理员</option>
-                <option value="2">纠错员</option>
-                <option value="3">采购员</option>
-                <option value="4">推销员</option>
-                <option value="5">运营人员</option>
-                <option value="6">编辑</option>
-              </select>
-            </div>
-          </div>
-        </div>
+      <div class=" layui-card-header layuiadmin-card-header-auto">
+        <button class="layui-btn layui-btn-asuma layuiadmin-btn-role" data-type="add">添加</button>
       </div>
       <div class="layui-card-body">
-        <div style="padding-bottom: 10px;">
-          <button class="layui-btn layui-btn-asuma layuiadmin-btn-role" data-type="batchdel">删除</button>
-          <button class="layui-btn layui-btn-asuma layuiadmin-btn-role" data-type="add">添加</button>
-        </div>
-      
         <table id="udzan-role" lay-filter="udzan-role"></table>  
        
       </div>
@@ -35,6 +19,23 @@
   </div>
 {/block}
 {block name="footjs"}
+<script type="text/html" id="statusTpl">
+  {{# if(d.id == 1){ }}
+  <button class="layui-btn layui-btn-xs layui-btn-primary status-btn">开启</button>
+  {{# }else{ }}
+  <input type="checkbox" name="status" value="{{d.id}}" title="开启" lay-filter="optstatus" {{d.status == 1 ? 'checked' : ''}}>
+  {{# } }}
+
+</script>
+<script type="text/html" id="optTpl">
+  {{# if(d.id == 1){ }}
+  <a class="layui-btn layui-btn-disabled layui-btn-xs" >编辑</a>
+  <a class="layui-btn layui-btn-disabled layui-btn-xs" >删除</a>
+  {{# }else{ }}
+  <a class="layui-btn layui-btn-asuma layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+  {{# } }}
+</script>
 <script>
   layui.config({
     base: '__THIRD__/layuiadmin/' //静态资源所在路径
@@ -45,25 +46,23 @@
     ,form = layui.form
     ,table = layui.table;
 
-    table.render({
+    var tableIns = table.render({
       elem: '#udzan-role'
       ,url: "{:url('roleList')}" //数据接口
       ,page: true //开启分页
+      ,limit: 15
       ,limits:[10,15,20]
+      ,done:function (res, curr, count) {
+        if(count <= this.limit){
+          $('.layui-table-page').addClass('layui-hide');//总条数小于每页限制条数时隐藏分页
+        }
+      }
       ,cols: [[ //表头
         {field: 'id', title: 'ID',  sort: true, width:65}
         ,{field: 'title', title: '角色名'}
         ,{field: 'remark', title: '描述'}
-        ,{field: 'status', title: '状态', templet: function(d){
-          var status = ''
-          switch(d.status){
-            case 1:  status = '正常' ; break;
-            case -2:  status = '冻结'; break;
-            default: status = '异常'; break;
-          }
-          return status;
-        }}
-        ,{title: '操作'}
+        ,{field: 'status', title: '状态', templet: '#statusTpl'}
+        ,{title: '操作', toolbar: '#optTpl'}
       ]]
     });
     
@@ -79,53 +78,77 @@
   
     //事件
     var active = {
-      batchdel: function(){
-        var checkStatus = table.checkStatus('LAY-user-back-role')
-        ,checkData = checkStatus.data; //得到选中的数据
-
-        if(checkData.length === 0){
-          return layer.msg('请选择数据');
-        }
-        
-        layer.confirm('确定删除吗？', function(index) {
-            
-          //执行 Ajax 后重载
-          /*
-          admin.req({
-            url: 'xxx'
-            //,……
-          });
-          */
-          table.reload('LAY-user-back-role');
-          layer.msg('已删除');
-        });
-      },
       add: function(){
         layer.open({
           type: 2
           ,title: '添加新角色'
-          ,content: 'roleform.html'
-          ,area: ['500px', '480px']
+          ,content: "{:url('roleAdd')}"
+          ,area: ['600px', '550px']
           ,btn: ['确定', '取消']
           ,yes: function(index, layero){
-            var iframeWindow = window['layui-layer-iframe'+ index]
-            ,submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
-
-            //监听提交
-            iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
-              var field = data.field; //获取提交的字段
-              
-              //提交 Ajax 成功后，静态更新表格中的数据
-              //$.ajax({});              
-              table.reload('LAY-user-back-role');
-              layer.close(index); //关闭弹层
-            });  
-            
+            var submit = layero.find('iframe').contents().find("#role-submit");
             submit.trigger('click');
           }
         }); 
       }
-    }  
+      ,edit:function(obj){
+        layer.open({
+          type: 2
+          ,title: '编辑角色'
+          ,content: "{:url('roleAdd')}?id="+obj.data.id
+          ,maxmin: true
+          ,btnAlign:'l'
+          ,area: ['600px', '550px']
+          ,btn: ['确定', '取消']
+          ,yes: function(index, layero){
+            var submit = layero.find('iframe').contents().find("#role-submit");
+            submit.trigger('click');
+          }
+        });
+      }
+      ,del: function(obj){
+        layer.prompt({
+          title: '<span style="color:red;font-weight:bold;font-size:15px;">确认删除？</span>'
+          ,formType: 1
+          ,success:function(layero){
+            layero.find('input').attr('placeholder', '请输入密码')
+        }},function(value, index, elem){
+          $.post("{:url('changeRoleStatus')}",{id:obj.data.id, status: 'delete', password: value}, function(res){
+            if(res.code == 1){
+              layer.close(index)
+              tableIns.reload()
+            }else if(res.code == -2){
+              layer.msg(res.result, {time:1500},function(){
+                layer.close(index)
+              });
+            }else{
+              layer.msg(res.result);
+            }
+          }, 'json')
+        });
+      }
+    }
+
+    form.on('checkbox(optstatus)', function(obj){
+      var wish = obj.elem.checked
+      var id = obj.value
+      $.post("{:url('changeRoleStatus')}",{id:id, status: wish}, function(res){
+        if(res.code != 1){
+          layer.tips(res.result, obj.othis, {tips:1});
+          obj.elem.checked = !wish;
+          form.render('checkbox');
+        }
+      }, 'json')
+    })
+
+    table.on('tool(udzan-role)', function(obj){
+      if(obj.event == 'del'){
+        active['del'].call(this, obj);
+      }else if(obj.event == 'edit'){
+        active['edit'].call(this, obj);
+      }
+    })
+
     $('.layui-btn.layuiadmin-btn-role').on('click', function(){
       var type = $(this).data('type');
       active[type] ? active[type].call(this) : '';

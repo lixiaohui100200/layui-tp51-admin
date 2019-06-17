@@ -90,6 +90,10 @@ class Tree {
      * @return array 返回分支，默认返回整个树
      */
     public function leaf($id = null) {
+        if(empty($this->result)){
+            return false;
+        }
+        
         $id = ($id == null) ? $this->root : $id;
         $this->handler();
         return isset($this->tmp[$id]) ? $this->tmp[$id] : [];
@@ -127,7 +131,7 @@ class Tree {
      * @param integer $id 分类id
      * @return array 返回树形数据列表
      */
-    public function table($tmpArr)
+    public function table()
     {
         $id = $this->root;
         $tmpArr = $this->result;

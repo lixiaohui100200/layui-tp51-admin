@@ -18,14 +18,17 @@ class AuthSet extends Base
 
     public function adminList()
     {
-        $admin = Db::table('admin_user')->field('id,name,login_name,phone,email,FROM_UNIXTIME(create_time, "%Y-%m-%d") AS create_time,status')->select();
-        $count = Db::table('admin_user')->count();
+        $admin = Db::name('admin_user')->field('id,name,login_name,phone,email,FROM_UNIXTIME(create_time, "%Y-%m-%d") AS create_time,status')->select();
+        $count = Db::name('admin_user')->count();
         
         return table_json($admin, $count);
     }
 
     public function addadmin()
     {
+        $roles = Db::name('auth_group')->field('id,title')->cache('allroles', 30*24*60*60, 'admin_role')->where('status', 1)->select();
+
+        $this->assign('roles', $roles);
         return $this->fetch();
     }
 
@@ -35,8 +38,8 @@ class AuthSet extends Base
             Db::startTrans();
             try {
                 $data = [
-                    'name' => $request->post('username'),
                     'login_name' => $request->post('loginname'),
+                    'name' => $request->post('username'),
                     'phone' => $request->post('phone'),
                     'email' => $request->post('email'),
                     'password' => md5safe('123456'),
@@ -45,24 +48,44 @@ class AuthSet extends Base
                     'create_by' => 0
                 ];
 
-                $whereor = [
-                    'login_name' => $data['login_name'],
-                    'email' => $data['email'],
-                    'phone' => $data['phone']
-                ];
+                $where = $this->parseWhere([
+                    ['login_name', '=', $data['login_name']],
+                    ['email', '=', $data['email']],
+                    ['phone', '=', $data['phone']]
+                ]);
 
-                $loginUser = Db::table('admin_user')->field('id,name,login_name,phone,email,password,head_img,status')->whereOr($whereor)->fetchSql(true)->where('status' ,'<>', -1)->select();
-                dump($loginUser);die;
-                
-                $result = Db::table('admin_user') -> insert($data);
-                !$result && exit(res_json_native(-3, '添加失败'));
+                $loginUser = Db::name('admin_user')
+                ->field('id,name,login_name,phone,email,password,head_img,status')
+                ->whereOr($where)->select();
+
+                in_array($data['login_name'], array_column($loginUser, 'login_name')) && exit(res_json_native(-3, '用户名已存在'));
+                in_array($data['phone'], array_column($loginUser, 'phone')) && exit(res_json_native(-3, '手机号已注册'));
+                in_array($data['email'], array_column($loginUser, 'email')) && exit(res_json_native(-3, '邮箱已注册'));
+
+                $new_id = Db::name('admin_user') -> insertGetId($data);
+                !$new_id && exit(res_json_native(-2, '添加失败'));
+
+                $roleArr= explode(',', $request->post('roles'));
+                foreach ($roleArr as $v) {
+                    $access[] = [
+                        'uid' => $new_id,
+                        'group_id' => $v
+                    ];
+                }
+
+                $result = Db::name('auth_group_access')->insertAll($access);
+
+                if(!$result){
+                    Db::rollback();
+                    return res_json(-4, '添加失败');
+                }
                 
                 Db::commit();
                 destroyFormToken($request->post());
                 return res_json(1);
             } catch (\Exception $e) {
                 Db::rollback();
-                return res_json(-1);
+                return res_json(-5, '系统错误');
             }
         }
 
@@ -76,10 +99,141 @@ class AuthSet extends Base
 
     public function roleList()
     {
-        $roles = Db::table('auth_group')->select();
-        $count = Db::table('auth_group')->count('id');
+        $get = $this->request->get();
+
+        $page = $get['page'] ?? 1;
+        $limit = $get['limit'] ?? 10;
+
+        $where = [
+            ['status', '<>', '-1']
+        ];
+
+        $formWhere = $this->parseWhere($where);
+        $cacheKey = 'role_'.md5(http_build_query($formWhere));
+        
+        $count = Db::name('auth_group')->where($formWhere)->cache($cacheKey.'_count', 30*24*60*60, 'admin_role')->count('id');
+        $roles = Db::name('auth_group')->where($formWhere)->order('id')->page($page, $limit)->cache($cacheKey.'_'.$page.'_'.$limit, 30*24*60*60, 'admin_role')->select();
 
         return table_json($roles, $count);
+    }
+
+    public function roleAdd(Request $request)
+    {
+        if($request->get('id')){
+            $roleInfo = Db::name('auth_group')->where('id', (int)$request->get('id'))->find();
+
+            $this->assign('role', $roleInfo);
+            return $this->fetch('role_edit');
+        }
+
+        return $this->fetch();
+    }
+
+    public function allrules()
+    {
+        $rules = \Db::name('auth_rule')->where('status', 1)->order(['sorted', 'id'])->cache('use_rules', 30*24*60*60, 'auth_rule')->select();
+
+        $tree = new \util\Tree($rules);
+        $mods = $tree->leaf();
+        
+        return json(['code' => 0, 'data' => $mods]);
+    }
+
+    public function rulesChecked()
+    {
+        $rulesArr = explode(",", $this->request->get('rules'));
+
+        $allrules = Db::name('auth_rule')->where('status', 1)->order(['sorted', 'id'])->cache('use_rules', 30*24*60*60, 'auth_rule')->select();
+
+        foreach ($allrules as &$v) {
+            in_array($v['id'], $rulesArr) && $v['checked'] = true;
+        }
+
+        $tree = new \util\Tree($allrules);
+        $mods = $tree->leaf();
+        return json(['code' => 0, 'data' => $mods]);
+    }
+
+    public function addNewRole(Request $request)
+    {
+        try {
+            $post = $request->post();
+            !checkFormToken($post) && exit(res_json_native(-2, '请勿重复提交'));
+
+            $rules = $post['rules'] ?? [];
+            empty($rules) && exit(res_json_native(-3, '请为角色选择规则节点'));
+            sort($rules);
+            $rules = implode(",", $rules);
+
+            $data = [
+                'title' => off_xss(trim($post['rolename'])),
+                'rules' => $rules,
+                'status' => $post['status'] ?? -2,
+                'remark' => $post['desc']
+            ];
+
+            $validate = \think\Validate::make([
+                'title' => 'require|max:30',
+                'remark' => 'max:200',
+            ],[
+                'title.require'=> '请填写角色名',
+                'title.max'    => '角色名最多不能超过30个字符',
+                'remark'       => '描述最多不能超过200个字符',
+            ]);
+
+            if(!$validate->check($data)){
+                return res_json(-4, $validate->getError());
+            }
+
+            if($post['role_id']){
+                $result = Db::name('auth_group') ->where('id', $post['role_id']) -> update($data);
+                !$result && exit(res_json_native(-1, '修改失败'));
+            }else{
+                $result = Db::name('auth_group') -> insert($data);
+                !$result && exit(res_json_native(-1, '添加失败'));
+            }
+            
+            \think\facade\Cache::clear('admin_role'); //清除规则缓存，让列表实时生效
+            destroyFormToken($post);
+            return res_json(1);
+        } catch (\Exception $e) {
+            return res_json(-100, $e->getMessage());
+        }
+    }
+
+    public function changeRoleStatus()
+    {
+        $id = (int)$this->request->post('id');
+        $uid = $this->request->uid;
+        $pwd = $this->request->post('password');
+
+        $cacheKey= md5('user_'.$uid);
+        $uid && $user = Db::name('admin_user')->where('id', '=', $uid)->cache($cacheKey, 30*24*60*60, 'admin_user')->find();
+        empty($user) && exit(res_json_native(-1, '用户信息获取失败，请重新登录'));
+        
+        switch ($this->request->post('status')) {
+            case 'true':
+                $status = 1;
+                break;
+            case 'delete':
+                $user['password'] != md5safe($pwd) && exit(res_json_native(-2, '密码错误'));
+                $status = -1;
+                break;
+            default:
+                $status = -2;
+                break;
+        }
+
+        $id && $res = Db::name('auth_group')->where('id', '=', $id)->update(['status' => $status]);
+
+        if($status == -1){
+            !$res && exit(res_json_native(-3, '删除失败'));
+        }else{
+            !$res && exit(res_json_native(-3, '状态切换失败'));
+        }
+        
+        \think\facade\Cache::clear('admin_role'); //清除规则缓存，让列表实时生效
+        return res_json(1);
     }
 
     public function permissions()
@@ -100,22 +254,22 @@ class AuthSet extends Base
 
         $formWhere = $this->parseWhere($where);
 
-        $count = Db::table('auth_rule')->where($formWhere)->count('id');
+        $cacheKey = 'rule_'.md5(http_build_query($formWhere));
+        $count = Db::name('auth_rule')->where($formWhere)->cache($cacheKey.'_count', 30*24*60*60, 'auth_rule')->count('id');
 
         if(empty($count)){
             return table_json([], 0);
         }
 
         // 查询所有规则，用以排序子父级关系，并存入缓存(tag:auth_rule)
-        $cacheKey = md5(http_build_query($formWhere));
-        $admin = Db::table('auth_rule')->where($formWhere)->order(['sorted', 'id'])->cache($cacheKey, 3600, 'auth_rule')->select();
+        $rules = Db::name('auth_rule')->where($formWhere)->order(['sorted', 'id'])->cache($cacheKey, 30*24*60*60, 'auth_rule')->select();
 
         $mark = count($formWhere);
         if(($where[1][2] && $mark > 2) || (!$where[1][2] && $mark > 1)) {
-            $modsTree = $admin;
+            $modsTree = $rules;
         }else{
-            $tree = new \util\Tree($admin);
-            $modsTree = $tree->table($admin);
+            $tree = new \util\Tree($rules);
+            $modsTree = $tree->table();
         }
 
         $page = $get['page'] ?? 1;
@@ -140,7 +294,7 @@ class AuthSet extends Base
             $where['type'] = 1;
         }
 
-        $mods = Db::table('auth_rule')->field('id,title,name,pid')->where($where)->order('sorted,id')->select();
+        $mods = Db::name('auth_rule')->field('id,title,name,pid')->where($where)->order('sorted,id')->select();
 
         if(empty($mods)){
             return null;
@@ -188,7 +342,7 @@ class AuthSet extends Base
                 return res_json(-3, $validate->getError());
             }
 
-            $result = Db::table('auth_rule') -> insert($data);
+            $result = Db::name('auth_rule') -> insert($data);
             !$result && exit(res_json_native(-1, '添加失败'));
 
             destroyFormToken($post);
@@ -198,7 +352,6 @@ class AuthSet extends Base
             $msg = false !== strpos($e->getMessage(), '1062') ? '权限标识重复' : $e->getMessage();
             return res_json(-100, $msg);
         }
-        
     }
 
     public function changeLogStatus()
@@ -207,7 +360,7 @@ class AuthSet extends Base
         $is_logged = $this->request->post('is_logged');
 
         $is_logged = $is_logged == 'true' ? 1 : 0;
-        $res = Db::table('auth_rule')->where('id', '=', $id)->update(['is_logged' => $is_logged]);
+        $res = Db::name('auth_rule')->where('id', '=', $id)->update(['is_logged' => $is_logged]);
         \think\facade\Cache::clear('auth_rule'); //清除规则缓存，让列表实时生效
         !$res && exit(res_json_native(-3, '切换失败'));
 
@@ -219,7 +372,7 @@ class AuthSet extends Base
         $post = $this->request->post();
         $post['is_menu'] != 1 && exit(res_json_native(-1, '非菜单无法设置权重'));
 
-        $post['id'] && $res = Db::table('auth_rule')->where('id', '=', (int)$post['id'])->update(['sorted' => (int)$post['newVal']]);
+        $post['id'] && $res = Db::name('auth_rule')->where('id', '=', (int)$post['id'])->update(['sorted' => (int)$post['newVal']]);
         !$res && exit(res_json_native(-3, '修改失败'));
         \think\facade\Cache::clear('auth_rule'); //清除规则缓存，让列表实时生效
 
@@ -232,8 +385,8 @@ class AuthSet extends Base
         $uid = $this->request->uid;
         $pwd = $this->request->post('password');
 
-        $cacheKey= md5('user_'.$uid);
-        $uid && $user = Db::table('admin_user')->where('id', '=', $uid)->cache($cacheKey, 86400, 'admin_user')->find();
+        $cacheKey= md5('adminUser_'.$uid);
+        $uid && $user = Db::name('admin_user')->where('id', '=', $uid)->cache($cacheKey, 30*24*60*60, 'admin_user')->find();
         empty($user) && exit(res_json_native(-1, '用户信息获取失败，请重新登录'));
         
         switch ($this->request->post('status')) {
@@ -242,7 +395,7 @@ class AuthSet extends Base
                 break;
             case 'delete':
                 $user['password'] != md5safe($pwd) && exit(res_json_native(-2, '密码错误'));
-                $info = Db::table('auth_rule')->field('id,name')->where('pid' , $id)->select();
+                $info = Db::name('auth_rule')->field('id,name')->where('pid' , $id)->select();
                 !empty($info) && exit(res_json_native(-2, '请先删除子权限'));
                 $status = -1;
                 break;
@@ -252,10 +405,10 @@ class AuthSet extends Base
         }
 
         if($status == -1){
-            $id && $res = Db::table('auth_rule')->delete($id);
+            $id && $res = Db::name('auth_rule')->delete($id);
             !$res && exit(res_json_native(-3, '删除失败'));
         }else{
-            $id && $res = Db::table('auth_rule')->where('id', '=', $id)->update(['status' => $status]);
+            $id && $res = Db::name('auth_rule')->where('id', '=', $id)->update(['status' => $status]);
             !$res && exit(res_json_native(-3, '状态切换失败'));
         }
         
@@ -267,7 +420,7 @@ class AuthSet extends Base
     public function authEdit()
     {
         $id = (int)$this->request->get('rule');
-        $id && $info = Db::table('auth_rule')->where(['id' => $id])->find();
+        $id && $info = Db::name('auth_rule')->where(['id' => $id])->find();
 
         isset($info) && $this->assign('info', $info);
         
@@ -303,7 +456,7 @@ class AuthSet extends Base
                 return res_json(-3, $validate->getError());
             }
 
-            $result = Db::table('auth_rule')->where('id', (int)$post['rule_id'])->update($data);
+            $result = Db::name('auth_rule')->where('id', (int)$post['rule_id'])->update($data);
             !$result && exit(res_json_native(-1, '修改失败'));
 
             destroyFormToken($post);
