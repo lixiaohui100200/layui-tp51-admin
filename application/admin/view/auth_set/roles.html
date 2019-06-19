@@ -25,7 +25,6 @@
   {{# }else{ }}
   <input type="checkbox" name="status" value="{{d.id}}" title="开启" lay-filter="optstatus" {{d.status == 1 ? 'checked' : ''}}>
   {{# } }}
-
 </script>
 <script type="text/html" id="optTpl">
   {{# if(d.id == 1){ }}
@@ -58,7 +57,7 @@
         }
       }
       ,cols: [[ //表头
-        {field: 'id', title: 'ID',  sort: true, width:65}
+        {field: 'id', title: 'ID', width:65}
         ,{field: 'title', title: '角色名'}
         ,{field: 'remark', title: '描述'}
         ,{field: 'status', title: '状态', templet: '#statusTpl'}

@@ -13,21 +13,64 @@ class AuthSet extends Base
 
     public function admins()
     {
+        $roles = Db::name('auth_group')->field('id,title')->cache('allroles', 30*24*60*60, 'admin_role')->where('status', 1)->select();
+        $this->assign('roles', $roles);
     	return $this->fetch();
     }
 
     public function adminList()
     {
-        $admin = Db::name('admin_user')->field('id,name,login_name,phone,email,FROM_UNIXTIME(create_time, "%Y-%m-%d") AS create_time,status')->select();
-        $count = Db::name('admin_user')->count();
+        $get = $this->request->get();
+
+        $page = $get['page'] ?? 1;
+        $limit = $get['limit'] ?? 10;
+
+        $where = [
+            ['login_name|email|phone', 'LIKE', $get['username'] ?? ''],
+            ['name', 'LIKE', $get['truename'] ?? ''],
+        ];
+
+        $where = $this->parseWhere($where);
+
+        $query = Db::name('admin_user')->alias('a')->fieldRaw('id,name,login_name,phone,email,FROM_UNIXTIME(create_time, "%Y-%m-%d") AS create_time,status,groupNames')->page($page, $limit)->where('status', '<>', '-1');
+
+        $leftTable = Db::name('auth_group_access')->field([
+            'acc.uid',
+            'GROUP_CONCAT(acc.group_id)' => 'groupIds',
+            'GROUP_CONCAT(g.title)' => 'groupNames'
+        ])->alias('acc')->leftjoin('auth_group g', 'acc.group_id=g.id')->group('acc.uid')->buildSql();
+
+        $query->leftjoin($leftTable.'b', 'a.id=b.uid');
+        $query->where($where);
+
+        if($get['role'] ?? ''){
+            $query->whereRaw('CONCAT(",", groupIds, ",") LIKE :groupIds', ['groupIds' => '%,'.$get['role'].',%']);
+        }
+
+        $admin = $query->select();
+
+        $countQuery = Db::name('admin_user')->alias('a')->where($where)->where('status', '<>', '-1');
+        if($get['role'] ?? ''){
+            $countQuery->leftjoin($leftTable.'b', 'a.id=b.uid');
+            $countQuery->whereRaw('CONCAT(",", groupIds, ",") LIKE :groupIds', ['groupIds' => '%,'.$get['role'].',%']);
+        }
+        $count = $countQuery->count();
         
         return table_json($admin, $count);
     }
 
     public function addadmin()
     {
+        if($this->request->get('id')){
+            $adminInfo = Db::name('admin_user')->where('id', (int)$this->request->get('id'))->find();
+            $hasRole = Db::name('auth_group_access')->where('uid', (int)$this->request->get('id'))->select();
+            $hasRoleId = array_column($hasRole, 'group_id');
+        }
+
         $roles = Db::name('auth_group')->field('id,title')->cache('allroles', 30*24*60*60, 'admin_role')->where('status', 1)->select();
 
+        $this->assign('admin', $adminInfo ?? []);
+        $this->assign('hasrole', $hasRoleId ?? []);
         $this->assign('roles', $roles);
         return $this->fetch();
     }
@@ -35,17 +78,22 @@ class AuthSet extends Base
     public function pulladmin(Request $request)
     {
         if(checkFormToken($request->post())){
+            $validate = new \app\admin\validate\Register;
+            if(!$validate->scene('register')->check($request->post())){
+                exit(res_json_str(-1, $validate->getError()));
+            }
+
             Db::startTrans();
             try {
                 $data = [
                     'login_name' => $request->post('loginname'),
-                    'name' => $request->post('username'),
+                    'name' => $request->post('truename'),
                     'phone' => $request->post('phone'),
                     'email' => $request->post('email'),
                     'password' => md5safe('123456'),
                     'status' => $request->post('status') ?: 0,
                     'create_time' => time(),
-                    'create_by' => 0
+                    'create_by' => $request->uid
                 ];
 
                 $where = $this->parseWhere([
@@ -55,15 +103,19 @@ class AuthSet extends Base
                 ]);
 
                 $loginUser = Db::name('admin_user')
-                ->field('id,name,login_name,phone,email,password,head_img,status')
-                ->whereOr($where)->select();
+                ->field('id,name,login_name,phone,email')
+                ->where(function($query) use($where){
+                    $query->whereOr($where);
+                })
+                ->where('status', '<>', -1)
+                ->select();
 
                 in_array($data['login_name'], array_column($loginUser, 'login_name')) && exit(res_json_native(-3, '用户名已存在'));
                 in_array($data['phone'], array_column($loginUser, 'phone')) && exit(res_json_native(-3, '手机号已注册'));
                 in_array($data['email'], array_column($loginUser, 'email')) && exit(res_json_native(-3, '邮箱已注册'));
 
                 $new_id = Db::name('admin_user') -> insertGetId($data);
-                !$new_id && exit(res_json_native(-2, '添加失败'));
+                !$new_id && exit(res_json_native(-6, '添加失败'));
 
                 $roleArr= explode(',', $request->post('roles'));
                 foreach ($roleArr as $v) {
@@ -90,6 +142,116 @@ class AuthSet extends Base
         }
 
         return res_json(-2, '请勿重复提交');
+    }
+
+    public function updateAdmin(Request $request)
+    {
+        empty($request->post('admin_id')) && exit(res_json_native(-2, '非法修改'));
+
+        if(checkFormToken($request->post())){
+            $validate = new \app\admin\validate\Register;
+            if(!$validate->scene('register')->check($request->post())){
+                exit(res_json_str(-1, $validate->getError()));
+            }
+
+            Db::startTrans();
+            try {
+                $data = [
+                    'login_name' => $request->post('loginname'),
+                    'name' => $request->post('truename'),
+                    'phone' => $request->post('phone'),
+                    'email' => $request->post('email')
+                ];
+
+                if($request->post('admin_id') != 1){
+                    $data['status'] = $request->post('status') ?: 0;
+                }
+
+                if($request->post('isReSetPwd') ?? ''){
+                    $data['password'] = md5safe('123456');
+                }
+
+                $where = $this->parseWhere([
+                    ['login_name', '=', $data['login_name']],
+                    ['email', '=', $data['email']],
+                    ['phone', '=', $data['phone']]
+                ]);
+
+                $loginUser = Db::name('admin_user')
+                ->field('id,name,login_name,phone,email')
+                ->where(function($query) use($where){
+                    $query->whereOr($where);
+                })
+                ->where('id', '<>', $request->post('admin_id'))
+                ->where('status', '<>', -1)
+                ->select();
+
+                in_array($data['login_name'], array_column($loginUser, 'login_name')) && exit(res_json_native(-3, '用户名已存在'));
+                in_array($data['phone'], array_column($loginUser, 'phone')) && exit(res_json_native(-3, '手机号已注册'));
+                in_array($data['email'], array_column($loginUser, 'email')) && exit(res_json_native(-3, '邮箱已注册'));
+
+                $update = Db::name('admin_user') ->where('id', $request->post('admin_id')) -> update($data);
+                $update === false && exit(res_json_native(-6, '修改失败'));
+
+                $roleArr= explode(',', $request->post('roles'));
+                foreach ($roleArr as $v) {
+                    $access[] = [
+                        'uid' => $request->post('admin_id'),
+                        'group_id' => $v
+                    ];
+                }
+
+                if($request->post('admin_id') != 1){
+                    Db::name('auth_group_access')->where('uid', (int)$request->post('admin_id'))->delete();
+                    $result = Db::name('auth_group_access')->insertAll($access);
+
+                    $cacheKey = 'group_1_'.$request->post('admin_id');
+                    \think\facade\Cache::rm($cacheKey); //清除用户组缓存，权限实时生效
+
+                    if(!$result){
+                        Db::rollback();
+                        return res_json(-4, '添加失败');
+                    }
+                }
+                
+                Db::commit();
+                destroyFormToken($request->post());
+                return res_json(1);
+            } catch (\Exception $e) {
+                Db::rollback();
+                return res_json(-5, '系统错误'.$e->getMessage());
+            }
+        }
+
+        return res_json(-2, '请勿重复提交');
+    }
+
+    public function changeAdminStatus()
+    {
+        $id = (int)$this->request->post('id');
+        $uid = $this->request->uid;
+        
+        switch ($this->request->post('status')) {
+            case 'true':
+                $status = 1;
+                break;
+            case 'delete':
+                $status = -1;
+                break;
+            default:
+                $status = -2;
+                break;
+        }
+
+        $id && $res = Db::name('admin_user')->where('id', '=', $id)->update(['status' => $status]);
+
+        if($status == -1){
+            !$res && exit(res_json_native(-3, '删除失败'));
+        }else{
+            !$res && exit(res_json_native(-3, '状态切换失败'));
+        }
+
+        return res_json(1);
     }
 
     public function roles()
@@ -185,7 +347,7 @@ class AuthSet extends Base
                 return res_json(-4, $validate->getError());
             }
 
-            if($post['role_id']){
+            if($post['role_id'] ?? ''){
                 $result = Db::name('auth_group') ->where('id', $post['role_id']) -> update($data);
                 !$result && exit(res_json_native(-1, '修改失败'));
             }else{

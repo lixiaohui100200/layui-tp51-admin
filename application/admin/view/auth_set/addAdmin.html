@@ -11,40 +11,48 @@
     <div class="layui-form-item">
       <label class="layui-form-label">登录名</label>
       <div class="layui-input-inline">
-        <input type="text" name="loginname" lay-verType="tips" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+        <input type="text" name="loginname" lay-verType="tips" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input" value="{$admin.login_name ?? ''}">
       </div>
     </div>
     <div class="layui-form-item">
       <label class="layui-form-label">姓名</label>
       <div class="layui-input-inline">
-        <input type="text" name="username" lay-verType="tips" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+        <input type="text" name="truename" lay-verType="tips" placeholder="请输入姓名" autocomplete="off" class="layui-input" value="{$admin.name ?? ''}">
       </div>
     </div>
     <div class="layui-form-item">
       <label class="layui-form-label">手机</label>
       <div class="layui-input-inline">
-        <input type="text" name="phone" lay-verType="tips" lay-verify="adminPhone" placeholder="请输入号码" autocomplete="off" class="layui-input">
+        <input type="text" name="phone" lay-verType="tips" lay-verify="adminPhone" placeholder="请输入号码" autocomplete="off" class="layui-input" value="{$admin.phone ?? ''}">
       </div>
     </div>
     <div class="layui-form-item">
       <label class="layui-form-label">邮箱</label>
       <div class="layui-input-inline">
-        <input type="text" name="email" lay-verType="tips" lay-verify="adminEmail" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+        <input type="text" name="email" lay-verType="tips" lay-verify="adminEmail" placeholder="请输入邮箱" autocomplete="off" class="layui-input" value="{$admin.email ?? ''}">
       </div>
     </div>
+    {if ($admin.id ?? '') != 1}
     <div class="layui-form-item">
+      {if $admin.id ?? ''}
+      <label class="layui-form-label">重置密码</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" lay-filter="switch" name="isReSetPwd" lay-skin="switch" lay-text="是|否" value="1">
+      </div>
+      {else /}
       <label class="layui-form-label">密码</label>
       <div class="layui-input-inline">
         <input type="text" name="password" placeholder="默认：123456" class="layui-input" disabled="">
       </div>
+      {/if}
     </div>
     <div class="layui-form-item">
       <label class="layui-form-label">角色</label>
-      <div class="layui-input-inline">
+      <div class="layui-input-block">
         <select name="roles" lay-verType="tips" lay-verify="required" xm-select="roleSel" xm-select-skin="normal" xm-select-max="4">
           <option value="">最多选四个</option>
           {volist name="roles" id="vo"}
-          <option value="{$vo.id}" {if $vo.id == 1}disabled{/if} >{$vo.title}</option>
+          <option value="{$vo.id}" {if $vo.id == 1}disabled{/if} {if in_array($vo.id, $hasrole)}selected{/if} >{$vo.title}</option>
           {/volist}
         </select>
       </div>
@@ -52,11 +60,13 @@
     <div class="layui-form-item">
       <label class="layui-form-label">状态</label>
       <div class="layui-input-inline">
-        <input type="checkbox" lay-filter="switch" name="status" lay-skin="switch" lay-text="正常|待审核" value="1">
+        <input type="checkbox" lay-filter="switch" name="status" lay-skin="switch" lay-text="正常|待审核" value="1" {if isset($admin.status) && $admin.status==1 }checked=""{/if}>
       </div>
     </div>
+    {/if}
     <div class="layui-form-item layui-hide">
       <input type="hidden" name="{:config('this.form_token')}" value="{$Request.token}" />
+      <input type="hidden" name="admin_id" value="{$admin.id ?? ''}">
       <input type="button" lay-submit lay-filter="asuma-admin-submit" id="asuma-admin-submit" value="确认">
     </div>
   </div>
@@ -71,7 +81,7 @@
     var form = layui.form
     ,formSelects = layui.formSelects;
 
-    // formSelects.render('selectId');
+    formSelects.btns('roleSel', []);
 
     form.verify({
       adminPhone:function(value, item){

@@ -14,7 +14,9 @@ class Register extends Validate
      */	
 	protected $rule = [
         'username' => 'require',
-        'phone' => 'require|mobile',
+        'loginname' => 'require|alphaDash|length:3,16',
+        'phone' => 'mobile',
+        'email' => 'email',
         'password' => 'require|length:6,12',
         'repassword' => 'require|confirm:password'
     ];
@@ -27,24 +29,18 @@ class Register extends Validate
      */	
     protected $message = [
         'username.require' => '用户名必填项',
-        'username.chsAlphaNum' => '用户名只能为字母、汉字或数字以及组合',
-        'phone.require' => '手机为必填项',
+        'loginname.require' => '登录名必填项',
+        'loginname.alphaDash' => '登录名只能是字母、数字和下划线_及破折号-组合',
+        'loginname.length' => '登录名长度为3到16位',
         'phone.mobile' => '手机格式不正确',
+        'email.email' => '邮箱格式不正确',
         'password.require' => '密码为必填项',
         'password.length' => '密码长度为1到12位',
         'repassword.require' => '请再次输入密码',
     ];
 
     protected $scene = [
-        'login' => ['username', 'password']
+        'login' => ['username', 'password'],
+        'register' => ['loginname', 'phone', 'email']
     ];
-
-    public function repeatPass($value,$rule,$data=[])
-    {
-        if($value != $data['password']){
-            return '两次输入密码不一致';
-        }
-
-        return true;
-    }
 }

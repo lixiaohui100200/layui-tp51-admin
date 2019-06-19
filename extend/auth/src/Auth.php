@@ -105,7 +105,7 @@ class Auth{
             ->join($this->_config['auth_group']." g", "g.id=a.group_id")
             ->where("a.uid='$uid' and g.status='1'")
             ->field('uid,group_id,title,rules')
-            ->cache($cacheKey, 30*24*60*60, 'admin_role')
+            ->cache($cacheKey, 30*24*60*60)
             ->select();
             
         $groups[$uid] = $user_groups ? $user_groups : [];
