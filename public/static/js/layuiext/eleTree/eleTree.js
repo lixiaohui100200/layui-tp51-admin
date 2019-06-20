@@ -473,7 +473,6 @@ layui.define(["jquery","laytpl"], function (exports) {
         checkboxInit: function() {
             var options=this.config;
             var _self=this;
-            console.log(options)
             options.elem.find("input[data-checked]").each(function(index,item) {
                 var checkboxEl=$(item).siblings(".eleTree-checkbox");
                 var childNode=checkboxEl.parent(".eleTree-node-content").siblings(".eleTree-node-group").find("input[name='eleTree-node']");

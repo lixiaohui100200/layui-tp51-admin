@@ -1,7 +1,7 @@
 <!-- 侧边菜单 -->
 <div class="layui-side layui-side-menu">
   <div class="layui-side-scroll">
-    <div class="layui-logo" lay-href="{:url($menu[0]['child'][0]['name'])}">
+    <div class="layui-logo" lay-href="{:url(isset($menu[0]['child']) ? $menu[0]['child'][0]['name'] : 'emptyAuth')}">
       <span>QingCMS</span>
     </div>
     

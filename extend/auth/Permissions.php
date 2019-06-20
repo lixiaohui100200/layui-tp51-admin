@@ -41,7 +41,7 @@ class Permissions extends Auth
 	/**
      * 获取权限菜单列表
      */
-	public function getmenu($uid, $mark = 1)
+	public function getMenu($uid, $mark = 1)
 	{
 		static $_menuList = array(); //保存用户验证通过的权限列表
         

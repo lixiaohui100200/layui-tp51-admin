@@ -45,6 +45,12 @@ cp .env.example .env
 ~~~
 vi .env #根据项目实际情况进行修改
 ~~~
+~~~
+DB_HOST = 127.0.0.1
+DB_NAME = my_db
+DB_USER = root
+DB_PWD = 123456
+~~~
 
 5.完成。 根据自身情况部署web环境
 

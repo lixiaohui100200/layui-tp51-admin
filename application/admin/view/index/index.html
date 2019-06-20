@@ -37,7 +37,7 @@
         </div>
         <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
           <ul class="layui-tab-title" id="LAY_app_tabsheader">
-            <li lay-id="{:url($menu[0]['child'][0]['name'] ?: 'emptyAuth')}" lay-attr="{:url($menu[0]['child'][0]['name'] ?: 'emptyAuth')}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
+            <li lay-id="{:url(isset($menu[0]['child']) ? ($menu[0]['child'][0]['name'] ?: 'emptyAuth') : 'emptyAuth')}" lay-attr="{:url(isset($menu[0]['child']) ? ($menu[0]['child'][0]['name'] ?: 'emptyAuth') : 'emptyAuth')}" class="layui-this"><i class="layui-icon layui-icon-home"></i></li>
           </ul>
         </div>
       </div>
@@ -45,7 +45,7 @@
       <!-- 主体内容 -->
       <div class="layui-body" id="LAY_app_body">
         <div class="layadmin-tabsbody-item layui-show">
-          <iframe src="{:url($menu[0]['child'][0]['name'] ?: 'emptyAuth')}" frameborder="0" class="layadmin-iframe"></iframe>
+          <iframe src="{:url(isset($menu[0]['child']) ? ($menu[0]['child'][0]['name'] ?: 'emptyAuth') : 'emptyAuth?msg=当前页面没有权限')}" frameborder="0" class="layadmin-iframe"></iframe>
         </div>
       </div>
       

@@ -6,7 +6,7 @@ class Index
 {
     public function index()
     {
-    	$rules = Permissions::getmenu(request()->uid);
+    	$rules = Permissions::getMenu(request()->uid);
 
         $tree = new \util\Tree($rules);
         $menu = $tree->leaf();
@@ -19,8 +19,8 @@ class Index
     	return view();
     }
 
-    public function emptyAuth()
+    public function emptyAuth($msg="还没有获得一些权限")
     {
-    	return view('/public/error', ['icon' => '#xe6af', 'error' => '还没有获得一些权限']);
+    	return view('/public/error', ['icon' => '#xe6af', 'error' => $msg]);
     }
 }

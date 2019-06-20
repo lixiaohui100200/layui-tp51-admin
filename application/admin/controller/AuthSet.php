@@ -32,13 +32,13 @@ class AuthSet extends Base
 
         $where = $this->parseWhere($where);
 
-        $query = Db::name('admin_user')->alias('a')->fieldRaw('id,name,login_name,phone,email,FROM_UNIXTIME(create_time, "%Y-%m-%d") AS create_time,status,groupNames')->page($page, $limit)->where('status', '<>', '-1');
+        $query = Db::name('admin_user')->alias('a')->fieldRaw('id,name,login_name,phone,email,FROM_UNIXTIME(create_time, "%Y-%m-%d") AS create_time,status,groupNames')->page($page, $limit)->where('status', '<>', '-1')->order('id');
 
         $leftTable = Db::name('auth_group_access')->field([
             'acc.uid',
             'GROUP_CONCAT(acc.group_id)' => 'groupIds',
             'GROUP_CONCAT(g.title)' => 'groupNames'
-        ])->alias('acc')->leftjoin('auth_group g', 'acc.group_id=g.id')->group('acc.uid')->buildSql();
+        ])->alias('acc')->leftjoin('auth_group g', 'acc.group_id=g.id')->where('g.status', '<>', '-1')->group('acc.uid')->buildSql();
 
         $query->leftjoin($leftTable.'b', 'a.id=b.uid');
         $query->where($where);
@@ -480,7 +480,7 @@ class AuthSet extends Base
                 'type' => (int)$post['type'],
                 'run_type' => (int)$post['run_type'],
                 'status' => $post['status'] ?? -2,
-                'sorted' => (int)$post['sorted'],
+                'sorted' => $post['run_type'] == 2 ? 99 : (int)$post['sorted'],
                 'pid' => (int)$post['pId'],
                 'is_menu' => $post['is_menu'] ?? 0,
                 'icon' => $post['icon'] ?? '',
@@ -597,8 +597,10 @@ class AuthSet extends Base
 
             $data = [
                 'title' => off_xss(trim($post['authtitle'])),
+                'name' => off_xss(trim($post['authname'])),
                 'status' => $post['status'] ?? -2,
                 'sorted' => (int)$post['sorted'],
+                'pid' => (int)$post['pId'],
                 'is_menu' => $post['is_menu'] ?? 0,
                 'icon' => $post['icon'] ?? '',
                 'is_logged' => $post['is_log'] ?? 0,

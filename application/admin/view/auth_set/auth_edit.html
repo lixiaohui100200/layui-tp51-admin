@@ -14,9 +14,28 @@
       </div>
     </div>
     <div class="layui-form-item">
+      <label class="layui-form-label">权限类型</label>
+      <div class="layui-input-inline">
+        <select name="type" lay-verType="tips" lay-verify="required" lay-filter="typeSel" data-url="{:url('modsTree')}">
+          <option value="">选择一个类型</option>
+          <option value="1" {if $info.type==1}selected{/if} >模块</option>
+          <option value="2" {if $info.type==2}selected{/if}>子模块</option> <!-- 一般用于左侧有三级菜单的情况 -->
+          <option value="3" {if $info.type==3}selected{/if}>节点</option>
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item" id="fatherMod" style="display: none;">
+      <label class="layui-form-label">所属上级</label>
+      <div class="layui-input-inline">
+        <select name="pId" class="fathersel" lay-verType="tips" lay-filter="fathersel" lay-verify="pidneed" lay-search>
+          <option></option>
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item">
       <label class="layui-form-label">权限标识</label>
       <div class="layui-input-inline">
-        <input type="text" name="authname"  placeholder="请输入标识" autocomplete="off" class="layui-input" value="{$info.name}" disabled="">
+        <input type="text" name="authname"  placeholder="请输入标识" autocomplete="off" class="layui-input" value="{$info.name}" {if $info.name=='AuthSet/permissions'}disabled{/if}>
       </div>
     </div>
     {if $info.run_type==1}
@@ -56,84 +75,27 @@
     <div class="layui-form-item">
       <label class="layui-form-label">状态</label>
       <div class="layui-input-inline">
-        <input type="checkbox" name="status" lay-skin="switch" lay-text="正常|关闭" value="1" {$info.status == 1 ? 'checked=""' : '' }>
+        <input type="checkbox" name="status" lay-skin="switch" lay-text="正常|关闭" value="1" {$info.status == 1 ? 'checked=""' : '' } {if $info.name=='AuthSet/permissions'}disabled{/if}>
       </div>
     </div>
     <div class="layui-form-item layui-hide">
       <input type="hidden" name="rule_id" value="{$info.id}">
       <input type="hidden" name="{:config('this.form_token')}" value="{$Request.token}" />
-      <input type="button" lay-submit lay-filter="auth-submit" id="auth-submit" value="确认">
+      <input type="button" lay-submit lay-filter="auth-submit" id="auth-submit" value="确认" data-url="{:url('editRule')}">
     </div>
   </div>
 {/block}
 {block name="footjs"}
-<script>
-  layui.config({
-    base: '__JS__/layuiext/' //静态资源所在路径
-  }).use(['form', 'laytpl', 'iconPicker'], function(){
-    var form = layui.form 
-    ,iconPicker = layui.iconPicker;
-
-    iconPicker.render({
-        // 选择器，推荐使用input
-        elem: '#iconPicker',
-        // 数据类型：fontClass/unicode，推荐使用fontClass
-        type: 'fontClass',
-        // 是否开启搜索：true/false，默认true
-        search: false,
-        // 是否开启分页：true/false，默认true
-        page: true,
-        // 每页显示数量，默认12
-        limit: 20,
-        cellWidth: '20%',
-        // 点击回调
-        click: function (data) {
-            //console.log(data);
-        },
-        // 渲染成功后的回调
-        success: function(d) {
-            //console.log(d);
-        }
-    });
-
-    form.on('switch(menuSwt)', function(data){
-      if(data.elem.checked){
-        $('#iconCtl').show();
-        $('#weight').show();
-      }else{
-        $('#iconCtl').hide();
-        $('#weight').hide();
-      }
-    })
-
-    form.verify({
-      Menu: function(value, item){
-        if($('input[name=is_menu]').prop('checked') && !$.trim(value)){
-          return '请给菜单选择一个图标';
-        }
-      }
-      ,descNeed: function(value, item){
-        if($('input[name=is_log]').prop('checked') && !$.trim(value)){
-          return '开启记录日志时权限描述为必填项';
-        }
-      }
-    })
-
-    //监听提交
-    form.on('submit(auth-submit)', function(data){
-      var field = data.field; //获取提交的字段
-      var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引  
-
-      //提交 Ajax 成功后，关闭当前弹层并重载表格
-      $.post("{:url('editRule')}", data.field, function(res){
-        if(res.code == 1){
-          parent.layui.table.reload('udzan-rule'); //重载表格
-          parent.layer.close(index); //再执行关闭 
-        }else{
-          layer.msg(res.result, {icon: 5});
-        }
-      },'json');
-    });
-  })
+<script id="treeMods" type="text/html">
+  <option></option>
+  {{# layui.each(d, function(i, t){ }}
+    <option value="{{t.id}}" data-l="1" {{# if (t.id == {$info.pid}) { }}selected{{# } }}>{{t.title}} ({{t.name}})</option>
+    {{# if(t.child){ }}
+      {{# layui.each(t.child, function(ii, tt){ }}
+        <option value="{{tt.id}}" data-l="2" {{# if (tt.id == {$info.pid}) { }}selected{{# } }}>└ {{tt.title}} ({{tt.name}})</option>
+      {{# }); }}
+    {{# } }}
+  {{# }); }}
 </script>
+<script type="text/javascript" src="__STATIC__/mod/admin/authset/auth_edit.js" id="auth_edit" data-path="__JS__"></script>
 {/block}
