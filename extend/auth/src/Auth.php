@@ -182,7 +182,8 @@ class Auth{
         static $userinfo = array();
 
         if(!isset($userinfo[$uid])){
-            $userinfo[$uid] = \think\Db::name($this->_config['auth_user'])->where(array('id' => $uid))->find();
+            $cacheKey= md5('user_'.$uid);
+            $userinfo[$uid] = \think\Db::name($this->_config['auth_user'])->where(array('id' => $uid))->cache($cacheKey, 30*24*60*60, 'admin_user')->find();
         }
 
         return $userinfo[$uid];

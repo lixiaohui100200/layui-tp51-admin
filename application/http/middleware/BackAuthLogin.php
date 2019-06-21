@@ -52,11 +52,16 @@ class BackAuthLogin
             
             // 权限检测
             if(!Permissions::check($node, $userInfo['uid'])){
-                return view('/public/error', ['icon' => '#xe6af', 'error' => '没有权限访问哦']);
+                if($request->isAjax()){
+                    return res_json(-101, '没有权限操作哦');
+                }else{
+                    return view('/public/error', ['icon' => '#xe6af', 'error' => '没有权限访问哦']);
+                }
             }
 
             $request->uid = $userInfo['uid'];
             $request->uname = $userInfo['uname'];
+            $request->ulogin = $userInfo['ulogin'];
         }
 
     	return $next($request);

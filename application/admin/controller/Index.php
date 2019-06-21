@@ -11,7 +11,7 @@ class Index
         $tree = new \util\Tree($rules);
         $menu = $tree->leaf();
     	
-        return view('', ['menu' => $menu]);
+        return view('', ['menu' => $menu, 'nickname' => request()->uname]);
     }
 
     public function panel()

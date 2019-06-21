@@ -3,8 +3,7 @@ namespace app\admin\controller;
 
 use think\Request;
 use app\admin\facade\Register;
-use Config;
-use Session;
+use think\facade\Hook;
 
 class Login 
 {
@@ -18,6 +17,8 @@ class Login
         $loginUser = Register::check($request->post());
         !Register::login($loginUser, $request->post('remembered')) && exit(res_json_str(0, '登录失败'));;
         
+        Hook::listen('admin_log', ['登录', '登录页登录系统']); //监听登录行为
+
         return res_json(1);
     }
     

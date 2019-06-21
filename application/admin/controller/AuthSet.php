@@ -6,11 +6,6 @@ use Db;
 
 class AuthSet extends Base
 {
-    public function index()
-    {
-        echo "authset";
-    }
-
     public function admins()
     {
         $roles = Db::name('auth_group')->field('id,title')->cache('allroles', 30*24*60*60, 'admin_role')->where('status', 1)->select();
@@ -62,7 +57,8 @@ class AuthSet extends Base
     public function addadmin()
     {
         if($this->request->get('id')){
-            $adminInfo = Db::name('admin_user')->where('id', (int)$this->request->get('id'))->find();
+            $cacheKey= md5('user_'.(int)$this->request->get('id'));
+            $adminInfo = Db::name('admin_user')->where('id', (int)$this->request->get('id'))->cache($cacheKey, 30*24*60*60, 'admin_user')->find();
             $hasRole = Db::name('auth_group_access')->where('uid', (int)$this->request->get('id'))->select();
             $hasRoleId = array_column($hasRole, 'group_id');
         }
@@ -207,6 +203,7 @@ class AuthSet extends Base
 
                     $cacheKey = 'group_1_'.$request->post('admin_id');
                     \think\facade\Cache::rm($cacheKey); //清除用户组缓存，权限实时生效
+                    \think\facade\Cache::clear('admin_user'); //清除用户数据缓存
 
                     if(!$result){
                         Db::rollback();
@@ -250,7 +247,8 @@ class AuthSet extends Base
         }else{
             !$res && exit(res_json_native(-3, '状态切换失败'));
         }
-
+        
+        \think\facade\Cache::clear('admin_user'); //清除用户数据缓存
         return res_json(1);
     }
 
@@ -599,7 +597,7 @@ class AuthSet extends Base
                 'title' => off_xss(trim($post['authtitle'])),
                 'name' => off_xss(trim($post['authname'])),
                 'status' => $post['status'] ?? -2,
-                'sorted' => (int)$post['sorted'],
+                'sorted' => $post['sorted'] ?? 99,
                 'pid' => (int)$post['pId'],
                 'is_menu' => $post['is_menu'] ?? 0,
                 'icon' => $post['icon'] ?? '',
@@ -629,6 +627,58 @@ class AuthSet extends Base
         } catch (\Exception $e) {
             return res_json(-100, $e->getMessage());
         }
+    }
+
+    public function operationLog()
+    {
+        return $this->fetch();
+    }
+
+    public function logList()
+    {
+        $get = $this->request->get();
         
+        $page = $get['page'] ?? 1;
+        $limit = $get['limit'] ?? 10;
+
+        $where = [];
+        if(isset($get['username']) && !empty($get['username'])){
+            $where[] = ['behavior_user', '=', $get['username']];
+        }
+        
+        $countQuery = Db::name('operation_log')->where($where);
+        $query = Db::name('operation_log')->where($where)->order('id DESC')->page($page, $limit);
+
+        if(isset($get['datetime']) && !empty($get['datetime'])){
+            $date = explode('~', $get['datetime']);
+            $get['start'] = $date[0];
+            $countQuery->whereTime('record_time', 'between', [$date[0].' 00:00:00', $date[1].' 23:59:59']);
+            $query->whereTime('record_time', 'between', [$date[0].' 00:00:00', $date[1].' 23:59:59']);
+        }
+
+        $count = $countQuery->count('id');
+        $logs = $query->select();
+
+        return table_json($logs, $count);
+    }
+
+    public function batchDeleteLogs()
+    {
+        $ids = $this->request->post('ids');
+        empty($ids) && exit(res_json_native(-1, '请选择要删除的数据'));
+
+        $uid = $this->request->uid;
+        $pwd = $this->request->post('password');
+
+        $cacheKey= md5('user_'.$uid);
+        $uid && $user = Db::name('admin_user')->where('id', '=', $uid)->cache($cacheKey, 30*24*60*60, 'admin_user')->find();
+        empty($user) && exit(res_json_native(-1, '用户信息获取失败，请重新登录'));
+
+        $user['password'] != md5safe($pwd) && exit(res_json_native(-2, '密码错误'));
+
+        $result = Db::name('operation_log')->where('id', 'IN', $ids)->delete();
+        !$result && exit(res_json_native(-1, '删除失败'));
+
+        return res_json(1);
     }
 }

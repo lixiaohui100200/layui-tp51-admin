@@ -1,0 +1,5 @@
+.laydate-theme-asuma .layui-this{background-color:#409EFF!important;}
+.laydate-theme-asuma .layui-laydate-content td.laydate-selected{background-color: #9ECDFE;}
+.laydate-theme-asuma .laydate-selected:hover{background-color:#9ECDFE !important;}
+.laydate-theme-asuma .layui-laydate-header i:hover, .layui-laydate-header span:hover{color: #409EFF;}
+.laydate-theme-asuma .layui-laydate-footer span:hover{color: #409EFF;}

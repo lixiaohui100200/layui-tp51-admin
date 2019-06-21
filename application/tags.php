@@ -24,5 +24,7 @@ return [
     // 日志写入
     'log_write'    => [],
     // 应用结束
-    'app_end'      => []
+    'app_end'      => [],
+    // 后台管理操作日志
+    'admin_log'    => ['app\\admin\\behavior\\AdminLog'],
 ];

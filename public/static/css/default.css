@@ -19,7 +19,7 @@
 .layadmin-link{color:#338fe5 !important;}
 
 /*选中色*/
-.layui-form-checked[lay-skin="primary"] i{border-color:#409EFF;background-color:#409EFF;}
+.layui-form-checked[lay-skin="primary"] i{border-color:#409EFF !important;background-color:#409EFF;}
 .layui-form-checkbox[lay-skin="primary"]:hover i{border-color:#409EFF;}
 .layui-form-select dl dd.layui-this{background-color:#409EFF;}
 .layui-form-radio > i:hover, .layui-form-radioed > i{color:#409EFF;}
