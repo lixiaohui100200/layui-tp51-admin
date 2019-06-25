@@ -2,7 +2,7 @@
 namespace app\admin\controller;
 
 use think\Request;
-use app\admin\facade\Register;
+use app\facade\Register;
 use think\facade\Hook;
 
 class Login 

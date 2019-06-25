@@ -79,7 +79,8 @@ class Register
 		//记住登录状态
 		if($remembered){
 			$expire = 24*60*60; //登录状态最长有效时间为24小时
-			$cookie_value = i_base64encode($user['id'].'_'.$user['login_name'].'_'.$user['password']);
+			$pwd = rand_str(4).$user['password'].rand_str(4);
+			$cookie_value = i_base64encode($user['id'].'_'.$user['login_name'].'_'.$pwd);
 			Cookie::set($this->cookie_key, $cookie_value, $expire);
 		}
 
@@ -101,7 +102,8 @@ class Register
 
 			static $user = [];
 			if(!isset($user['id'])){
-				$user = Db::table('admin_user')->field('id,name,login_name,head_img')->where('id','=',$secret[0])->where('login_name','=',$secret[1])->where('password','=',$secret[2])->findOrEmpty();
+				$pwd = substr($secret[2], 4, -4);
+				$user = Db::table('admin_user')->field('id,name,login_name,head_img')->where('id', '=', $secret[0])->where('login_name', '=', $secret[1])->where('password','=', $pwd)->findOrEmpty();
 			}
 
 			return $user ?: false;

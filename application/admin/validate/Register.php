@@ -18,7 +18,8 @@ class Register extends Validate
         'phone' => 'mobile',
         'email' => 'email',
         'password' => 'require|length:6,12',
-        'repassword' => 'require|confirm:password'
+        'repassword' => 'require|confirm:password',
+        'remark' => 'length:2,250'
     ];
     
     /**
@@ -35,12 +36,16 @@ class Register extends Validate
         'phone.mobile' => '手机格式不正确',
         'email.email' => '邮箱格式不正确',
         'password.require' => '密码为必填项',
-        'password.length' => '密码长度为1到12位',
+        'password.length' => '密码长度为6到12位',
         'repassword.require' => '请再次输入密码',
+        'repassword.confirm' => '两次输入密码不一致',
+        'remark.length' => '备注长度在2到250位'
     ];
 
     protected $scene = [
         'login' => ['username', 'password'],
-        'register' => ['loginname', 'phone', 'email']
+        'register' => ['loginname', 'phone', 'email'],
+        'modify' => ['phone', 'email', 'remark'],
+        'changepwd' => ['password', 'repassword']
     ];
 }

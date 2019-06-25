@@ -241,7 +241,6 @@ function table_json($data = [], $count = 0, $code = 0, $msg = "")
     return json(['code' => $code, 'msg' => $msg, 'count' => $count, 'data' => $data]);
 }
 
-
 /**
  * @param $val 字符串
  * xss过滤

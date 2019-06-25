@@ -57,7 +57,7 @@ class AuthSet extends Base
     public function addadmin()
     {
         if($this->request->get('id')){
-            $cacheKey= md5('user_'.(int)$this->request->get('id'));
+            $cacheKey= md5('adminUser_'.(int)$this->request->get('id'));
             $adminInfo = Db::name('admin_user')->where('id', (int)$this->request->get('id'))->cache($cacheKey, 30*24*60*60, 'admin_user')->find();
             $hasRole = Db::name('auth_group_access')->where('uid', (int)$this->request->get('id'))->select();
             $hasRoleId = array_column($hasRole, 'group_id');
@@ -367,7 +367,7 @@ class AuthSet extends Base
         $uid = $this->request->uid;
         $pwd = $this->request->post('password');
 
-        $cacheKey= md5('user_'.$uid);
+        $cacheKey= md5('adminUser_'.$uid);
         $uid && $user = Db::name('admin_user')->where('id', '=', $uid)->cache($cacheKey, 30*24*60*60, 'admin_user')->find();
         empty($user) && exit(res_json_native(-1, '用户信息获取失败，请重新登录'));
         
@@ -670,7 +670,7 @@ class AuthSet extends Base
         $uid = $this->request->uid;
         $pwd = $this->request->post('password');
 
-        $cacheKey= md5('user_'.$uid);
+        $cacheKey= md5('adminUser_'.$uid);
         $uid && $user = Db::name('admin_user')->where('id', '=', $uid)->cache($cacheKey, 30*24*60*60, 'admin_user')->find();
         empty($user) && exit(res_json_native(-1, '用户信息获取失败，请重新登录'));
 

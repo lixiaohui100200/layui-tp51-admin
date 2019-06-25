@@ -6,10 +6,15 @@ use think\Controller;
 
 class Base extends Controller
 {
-    
+    protected $uid = NULL;
+    protected $uname = NULL;
+    protected $ulogin = NULL;
+
     protected function initialize()
     {
-        // echo "init ";
+        $this->uid = $this->request->uid;
+        $this->uname = $this->request->uname;
+        $this->ulogin = $this->request->ulogin;
     }
 
     public function parseWhere($where): array
