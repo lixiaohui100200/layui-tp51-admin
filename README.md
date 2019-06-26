@@ -99,6 +99,15 @@ Redis::方法(args1 [,args2...]);
 Redis::get('key');
 ~~~
 
+### 使用百度UEditor
+
+在模板需要使用富文本编辑器的地方引入以下代码
+~~~
+{include file="public/ueditor" name="" content=''}
+~~~
+
+>`name`为form表单域名称  `content`为编辑器初始化的内容，没有内容请为空
+
 ## 作者
 
 + [微博](https://weibo.com/770878450)
