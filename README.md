@@ -17,7 +17,6 @@ iAsuma/layui-tp51-admin(又名QingCMS，轻CMS) 纯净轻盈的后台管理系�
  + php7.0以上
  + Mysql5.7以上
  + Redis
- + 除常用的php扩展外，还需安装php-redis扩展（必须，本系统多处使用到了redis作为数据存储）
 
 ## 安装步骤
 
@@ -63,15 +62,41 @@ http://your-domain.com/admin
 
 ## other
 
-1.加载手动引入的第三方类库（如果部分引入的类库无法加载时执行）
+* 加载手动引入的第三方类库（如果部分引入的类库无法加载时执行）
 ~~~
 composer dump-autoload
 ~~~
 
-2.更新Thinkphp框架（如果需要最新的thinkphp时执行）
+* 更新Thinkphp框架（如果需要最新的thinkphp时执行）
 
 ~~~
 composer update topthink/framework
+~~~
+
+## 部分功能
+
+### 权限日志
+记录管理后台日志有两种方式
+1. 在权限中的权限管理添加异步权限，并开启记录日志开关
+2. 在相应的业务代码中添加`admin_log`钩子
+~~~
+Hook::listen('admin_log', ['权限名称', '权限行为描述']); 
+~~~
+示例：
+~~~
+Hook::listen('admin_log', ['登录', '登录页登录系统']); //监听登录行为
+~~~
+>在权限管理中开启了记录日志，不可在相关权限中再次添加记录日志的钩子
+
+### Redis 
+使用Redis扩展，除了thinkphp的Cache类，还可以引用 \extend\util\Redis 扩展类
+
+~~~
+Redis::方法(args1 [,args2...]);
+~~~
+示例：
+~~~
+Redis::get('key');
 ~~~
 
 ## 作者
