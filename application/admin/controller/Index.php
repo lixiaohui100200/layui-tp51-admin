@@ -19,17 +19,15 @@ class Index
     	return view();
     }
 
-    public function test()
-    {
-        return view();
-    }
-
+    /**
+    * 百度UEditor请求方法重写
+    */
     public function ueditor($action="")
     {
         if($action == ""){
-            return view('public/ueditor');
+            return view('/public/error', ['icon' => '#xe6af', 'error' => '非法请求']);
         }else{
-            echo $action;    
+            return \ueditor\facade\UEditor::action();
         }
     }
 

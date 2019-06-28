@@ -5,7 +5,7 @@ iAsuma/layui-tp51-admin(又名QingCMS，轻CMS) 纯净轻盈的后台管理系�
 优化或新增的功能：
 
  + 常用的工具方法如随机字符串、优化的MD5密码加密、安全的base64加密解密、手机号验证、日志调试等（位于应用目录下的common.php里）
- + 常用的应用与浏览器检测中间件, 微信/钉钉自动授权登录
+ + 常用的应用与浏览器检测中间件, 微信自动授权登录
  + 使用单例模式构造的Redis类
 
 内置扩展：
@@ -71,6 +71,16 @@ composer dump-autoload
 
 ~~~
 composer update topthink/framework
+~~~
+
+* 若需要使用阿里短信功能
+~~~
+git clone https://github.com/iAsuma/sms-extend.git
+~~~
+
+* 若需要使用钉钉授权中间件
+~~~
+git clone https://github.com/iAsuma/dingtalk-extend.git
 ~~~
 
 ## 部分功能

@@ -6,6 +6,7 @@
  * Date: 12-7-18
  * Time: 上午11: 32
  * UEditor编辑器通用上传类
+ * @author Modify: Asuma(lishuaiqiu) 2019-06-28
  */
 class Uploader
 {
@@ -287,6 +288,7 @@ class Uploader
         $t = time();
         $d = explode('-', date("Y-y-m-d-H-i-s"));
         $format = $this->config["pathFormat"];
+        $format = str_replace("{root}", env('FILE_ROOT_PATH'), $format);
         $format = str_replace("{yyyy}", $d[0], $format);
         $format = str_replace("{yy}", $d[1], $format);
         $format = str_replace("{mm}", $d[2], $format);

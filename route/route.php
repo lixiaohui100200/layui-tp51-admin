@@ -15,4 +15,5 @@ Route::group('admin', function(){
 	Route::group(['method' => 'get'],[
 		'/' => 'admin/index/index'
 	]);
+	Route::rule('ueditor' , 'admin/index/ueditor');
 });
