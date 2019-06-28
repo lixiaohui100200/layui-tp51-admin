@@ -3,7 +3,7 @@ namespace util;
 /**
  * Tree 树型类(无限分类)
  *
- * @author Kvoid
+ * @author Kvoid (modify: Asuma(lishuaiqiu))
  * @copyright http://kvoid.com
  * @version 1.0
  * @access public

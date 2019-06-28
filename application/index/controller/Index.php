@@ -5,24 +5,9 @@ class Index
 {
     public function index()
     {
-        return view();
     	echo "ok index";
     }
-
-    public function test()
-    {
-        $data = \think\facade\Request::post();
-        if(checkFormToken($data)){
-            
-            //code...
-            
-            destroyFormToken($data);
-            exit('1');
-        }
-
-        exit('-1');
-    }
-
+    
     /**
     * 跳回上一个页面
     * @param $default 默认跳转的url，可接受get中的default

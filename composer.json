@@ -21,10 +21,7 @@
         "overtrue/wechat": "~4.0"
     },
     "autoload": {
-        "classmap":[
-            "vendor/taobao",
-            "vendor/aliyunsms"
-        ],
+        "classmap":[],
         "psr-4": {
             "app\\": "application"
         }

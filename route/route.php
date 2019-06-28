@@ -11,14 +11,8 @@
 
 Route::get('redirect', 'index/redirectLast'); //记住的跳转地址
 
-Route::group('do', function(){
-	Route::group(['method' => 'post'], [
-		'sendmsg' => 'through/sendMsgCode' //发送验证码
-	]);
-});
-
 Route::group('admin', function(){
-	Route::group(['method' => 'post'],[
+	Route::group(['method' => 'get'],[
 		'/' => 'admin/index/index'
 	]);
 });
