@@ -37,6 +37,7 @@ return [
         '__IMAGE__' => '/static/images',
         '__JS__' => '/static/js',
         '__CSS__' => '/static/css',
-        '__THIRD__' => '/static/third'
+        '__THIRD__' => '/static/third',
+        '__FILEROOT__' => Env::get('FILE_ROOT_PATH')
     ]
 ];

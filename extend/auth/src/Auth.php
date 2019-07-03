@@ -105,7 +105,7 @@ class Auth{
             ->join($this->_config['auth_group']." g", "g.id=a.group_id")
             ->where("a.uid='$uid' and g.status='1'")
             ->field('uid,group_id,title,rules')
-            ->cache($cacheKey, 30*24*60*60)
+            ->cache($cacheKey, 24*60*60)
             ->select();
             
         $groups[$uid] = $user_groups ? $user_groups : [];
@@ -147,7 +147,7 @@ class Auth{
 
         $cacheKey = 'rule'.$mark.'_'.md5(http_build_query($map));
         //读取用户组所有权限规则
-        $rules = \think\Db::name($this->_config['auth_rule'])->field('condition,name')->cache($cacheKey, 30*24*60*60, 'auth_rule')->where($map)->select();
+        $rules = \think\Db::name($this->_config['auth_rule'])->field('condition,name')->cache($cacheKey, 24*60*60, 'auth_rule')->where($map)->select();
 
         //循环规则，判断结果。
         $authList = array();
@@ -183,7 +183,7 @@ class Auth{
 
         if(!isset($userinfo[$uid])){
             $cacheKey= md5('adminUser_'.$uid);
-            $userinfo[$uid] = \think\Db::name($this->_config['auth_user'])->where(array('id' => $uid))->cache($cacheKey, 30*24*60*60, 'admin_user')->find();
+            $userinfo[$uid] = \think\Db::name($this->_config['auth_user'])->where(array('id' => $uid))->cache($cacheKey, 24*60*60, 'admin_user')->find();
         }
 
         return $userinfo[$uid];

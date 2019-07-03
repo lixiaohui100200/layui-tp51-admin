@@ -16,4 +16,5 @@ Route::group('admin', function(){
 		'/' => 'admin/index/index'
 	]);
 	Route::rule('ueditor' , 'admin/index/ueditor');
+	Route::rule('layuiUpload', 'admin/index/layuiUpload');
 });

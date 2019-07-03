@@ -23,7 +23,7 @@ layui.config({
           tree.updateKeySelf(rules[i]['id'], rules[i]);
         }else{
           for (var j = 0; j < rules[i]['child'].length; j++) {
-            if(rules[i]['child'][j]['id'] == 6) {
+            if(rules[i]['child'][j]['id'] == 6 || rules[i]['child'][j]['id'] == 7) {
               rules[i]['child'][j]['disabled'] = true
               tree.updateKeySelf(rules[i]['child'][j]['id'], rules[i]['child'][j]);
             }

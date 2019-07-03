@@ -64,7 +64,11 @@
 </script>
 <script type="text/html" id="optTpl">
   <a class="layui-btn layui-btn-asuma layui-btn-xs" lay-event="edit">编辑</a>
+  {{# if(d.name == 'AuthSet/permissions'){ }}
+  <a class="layui-btn layui-btn-disabled layui-btn-xs" >删除</a>
+  {{# }else{ }}
   <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+  {{# } }}
 </script>
 <script type="text/javascript" src="__STATIC__/mod/admin/authset/permissions.js"></script>
 {/block}

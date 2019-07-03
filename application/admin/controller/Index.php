@@ -14,9 +14,13 @@ class Index
         return view('', ['menu' => $menu, 'nickname' => request()->uname]);
     }
 
-    public function panel()
+    /**
+    * 仅供Layui上传接口调用，不做实际上传
+    * 通过base64实现与form表单同步提交
+    */
+    public function layuiUpload()
     {
-    	return view();
+        return res_json(100, 'layui虚拟调用，未做实际上传');
     }
 
     /**
@@ -31,6 +35,9 @@ class Index
         }
     }
 
+    /**
+    * 空权限时的访问页面
+    */
     public function emptyAuth($msg="还没有获得一些权限")
     {
     	return view('/public/error', ['icon' => '#xe6af', 'error' => $msg]);

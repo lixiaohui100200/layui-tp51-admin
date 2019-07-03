@@ -46,7 +46,8 @@ layui.use(['table'], function(){
   form.on('checkbox(optstatus)', function(obj){
     var wish = obj.elem.checked
     var id = obj.value
-    $.post($('#udzan-admin').data('sturl'),{id:id, status: wish}, function(res){
+    var name = $(obj.elem).data('name')
+    $.post($('#udzan-admin').data('sturl'),{id:id, status: wish, name: name}, function(res){
       if(res.code != 1){
         layer.tips(res.result, obj.othis, {tips:1});
         obj.elem.checked = !wish;
@@ -125,7 +126,7 @@ layui.use(['table'], function(){
     ,del:function(obj) {
       let msg = '即将删除用户：'+obj.data.login_name
       layer.confirm(msg, {title:'<span style="color:red;font-weight:bold;font-size:15px;">确认删除？</span>'},function(index){
-        $.post($('#udzan-admin').data('sturl'), {id:obj.data.id, status: 'delete'}, function(res){
+        $.post($('#udzan-admin').data('sturl'), {id:obj.data.id, status: 'delete',name: obj.data.login_name}, function(res){
           if(res.code == 1){
             layer.close(index)
             tableInx.reload()

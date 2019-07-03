@@ -70,7 +70,7 @@ layui.use(['table'], function(){
         ,success:function(layero){
           layero.find('input').attr('placeholder', '请输入密码')
       }},function(value, index, elem){
-        $.post($('#udzan-role').data('sturl'),{id:obj.data.id, status: 'delete', password: value}, function(res){
+        $.post($('#udzan-role').data('sturl'),{id:obj.data.id, status: 'delete', password: value, name:obj.data.title}, function(res){
           if(res.code == 1){
             layer.close(index)
             tableIns.reload()
@@ -89,7 +89,8 @@ layui.use(['table'], function(){
   form.on('checkbox(optstatus)', function(obj){
     var wish = obj.elem.checked
     var id = obj.value
-    $.post($('#udzan-role').data('sturl'),{id:id, status: wish}, function(res){
+    var name = $(obj.elem).data('name')
+    $.post($('#udzan-role').data('sturl'),{id:id, status: wish,name: name}, function(res){
       if(res.code != 1){
         layer.tips(res.result, obj.othis, {tips:1});
         obj.elem.checked = !wish;

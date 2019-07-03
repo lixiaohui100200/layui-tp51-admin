@@ -111,12 +111,86 @@ Redis::get('key');
 
 ### 使用百度UEditor
 
-在模板需要使用富文本编辑器的地方引入以下代码
+在模板中需要使用富文本编辑器的地方引入以下代码
 ~~~
 {include file="public/ueditor" name="" content=''}
 ~~~
 
->`name`为form表单域名称  `content`为编辑器初始化的内容，没有内容请为空
+>`name`为form表单域字段名称  `content`为编辑器初始化的内容，没有内容请为空
+
+### 上传文件扩展
+
+修改.env 
+~~~
+FILE_UPLOAD_ROOT = ./uploads #上传文件根目录
+~~~
+获取表单上传文件
+~~~
+$file = app('upload')->file();
+$file = app('upload')->file('image'); #获取name为image的FILE文件信息
+~~~
+上传文件
+~~~
+app('upload')->move($file);
+app('upload')->move($file, false); 保留文件名
+app('upload')->move($file, 'XXX的文件'); 自定义文件名
+app('upload')->move($file, true, false); 自动生成文件名，但不覆盖同名文件
+~~~
+单文件上传示例
+~~~
+<form action="/index/index/upload" enctype="multipart/form-data" method="post">
+<input type="file" name="image" /> <br> 
+<input type="submit" value="上传" /> 
+</form>
+~~~
+~~~
+public function upload(){
+    // 获取表单上传文件 例如上传了001.jpg
+    $file = app('upload')->file('image');
+    // 上传文件
+    $info = app('upload')->move($file);
+    if($info){
+        // 成功上传后 获取上传信息
+        // 输出 jpg
+        echo $info->getExtension();
+        // 输出 20190701/42a79759f284b767dfcb2a0197904287.jpg
+        echo $info->getSaveName();
+        // 输出 /20190701/42a79759f284b767dfcb2a0197904287.jpg
+        echo $info->savePath; //新增变量
+        // 输出 42a79759f284b767dfcb2a0197904287.jpg
+        echo $info->getFilename(); 
+    }else{
+        // 上传失败获取错误信息
+        echo $file->getError();
+    }
+}
+~~~
+多文件上传示例
+~~~
+<form action="/index/index/upload" enctype="multipart/form-data" method="post">
+<input type="file" name="image[]" /> <br> 
+<input type="file" name="image[]" /> <br> 
+<input type="file" name="image[]" /> <br> 
+<input type="submit" value="上传" /> 
+</form>
+~~~
+~~~
+public function upload(){
+    // 获取表单上传文件
+    $files = app('upload')->file('image');
+    foreach($files as $file){
+        // 上传文件
+        $info = app('upload')->move($file);
+        if($info){
+            // 成功上传后 获取上传信息
+            // 与单文件上传相同
+        }else{
+            // 上传失败获取错误信息
+            echo $file->getError();
+        }    
+    }
+}
+~~~
 
 ## 作者
 

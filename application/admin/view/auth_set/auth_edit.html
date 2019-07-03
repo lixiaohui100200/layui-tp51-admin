@@ -42,7 +42,7 @@
     <div class="layui-form-item" id="menuCtl">
       <label class="layui-form-label">设为菜单</label>
       <div class="layui-input-inline">
-        <input type="checkbox" lay-filter="menuSwt" name="is_menu" lay-skin="switch" lay-text="是|否" value="1" {$info.is_menu == 1 ? 'checked=""' : '' }>
+        <input type="checkbox" lay-filter="menuSwt" name="is_menu" lay-skin="switch" lay-text="是|否" value="1" {$info.is_menu == 1 ? 'checked=""' : '' } {if $info.name=='AuthSet/permissions'}disabled{/if}>
       </div>
     </div>
     <div class="layui-form-item" id="iconCtl" {if $info.is_menu != 1}style="display: none;"{/if}>
