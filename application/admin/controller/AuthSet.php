@@ -87,7 +87,7 @@ class AuthSet extends Base
                     'name' => $request->post('truename'),
                     'phone' => $request->post('phone'),
                     'email' => $request->post('email'),
-                    'password' => md5safe('123456'),
+                    'password' => md5safe(config('this.admin_init_pwd')),
                     'status' => $request->post('status') ?: 0,
                     'create_time' => time(),
                     'create_by' => $request->uid
@@ -167,7 +167,7 @@ class AuthSet extends Base
                 }
 
                 if($request->post('isReSetPwd') ?? ''){
-                    $data['password'] = md5safe('123456');
+                    $data['password'] = md5safe(config('this.admin_init_pwd'));
                 }
 
                 $where = $this->parseWhere([
