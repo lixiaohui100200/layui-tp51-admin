@@ -6,7 +6,6 @@
 // +----------------------------------------------------------------------
 
 namespace app\http\middleware;
-use util\Redis;
 use Session;
 use EasyWeChat\Factory;
 
@@ -16,7 +15,8 @@ class InAppCheck
     {
     	if (preg_match('~micromessenger~i', $request->header('user-agent'))) {
             $request->InApp = 'WeChat';
-            if(!Session::has('wechat.original.openid')){
+
+            if(!Session::has('wechat.openid')){
                 $this->wechat($request); //微信授权
             }
         } else if (preg_match('~alipay~i', $request->header('user-agent'))) {
@@ -40,6 +40,7 @@ class InAppCheck
             $config['secret'] = config('wechat.official_account')['default']['secret'];
             $app = Factory::officialAccount($config);
             $user = $app->oauth->user();
+
             Session::set('wechat.openid', $user['id']);
             Session::set('wechat.userinfo', $user['original']);
         }else{
@@ -48,6 +49,7 @@ class InAppCheck
                 'callback' => $this->getTargetUrl($request),
             ];
             $app = Factory::officialAccount($config);
+
             header("location: ". $app->oauth->redirect()->getTargetUrl());
             exit(); //执行跳转后进行业务隔离阻断，防止程序继续执行
         }
