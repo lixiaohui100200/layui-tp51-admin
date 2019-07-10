@@ -288,7 +288,7 @@ class Uploader
         $t = time();
         $d = explode('-', date("Y-y-m-d-H-i-s"));
         $format = $this->config["pathFormat"];
-        $format = str_replace("{root}", env('UEDITOR_UPLOAD_ROOT'), $format);
+        $format = str_replace("{root}", env('UEDITOR_UPLOAD_PATH'), $format);
         $format = str_replace("{yyyy}", $d[0], $format);
         $format = str_replace("{yy}", $d[1], $format);
         $format = str_replace("{mm}", $d[2], $format);
@@ -328,7 +328,8 @@ class Uploader
     private function getFilePath()
     {
         $fullname = $this->fullName;
-        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        // $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        $rootPath = env('FILE_ROOT_PATH');
 
         if (substr($fullname, 0, 1) != '/') {
             $fullname = '/' . $fullname;

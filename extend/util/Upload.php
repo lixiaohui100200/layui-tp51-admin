@@ -24,7 +24,7 @@ class Upload
      */
 	public function move($file, $autoname = true, $replace = true, $autoAppendExt = true)
 	{
-		$env_path = Request::env('FILE_UPLOAD_ROOT');
+		$env_path = Request::env('FILE_ROOT_PATH').Request::env('FILE_UPLOAD_PATH');
 
 		if($env_path){
 			$this->file_path = $env_path;
@@ -57,7 +57,7 @@ class Upload
 	*/
 	public function base64ToImage($base64Str)
 	{
-		$env_path = Request::env('FILE_UPLOAD_ROOT');
+		$env_path = Request::env('FILE_ROOT_PATH').Request::env('FILE_UPLOAD_PATH');
 
 		if($env_path){
 			$this->file_path = $env_path;

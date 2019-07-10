@@ -118,11 +118,14 @@ Redis::get('key');
 
 >`name`为form表单域字段名称  `content`为编辑器初始化的内容，没有内容请为空
 
+如需修改文件上传主目录，只需修改.env环境变量`FILE_ROOT_PATH`和`UEDITOR_UPLOAD_PATH`
+
 ### 上传文件扩展
 
 修改.env 
 ~~~
-FILE_UPLOAD_ROOT = ./uploads #上传文件根目录
+FILE_ROOT_PATH = . #文件根目录
+FILE_UPLOAD_PATH = /uploads #上传文件主目录
 ~~~
 获取表单上传文件
 ~~~
@@ -190,6 +193,10 @@ public function upload(){
         }    
     }
 }
+~~~
+base64图片编码字符串转图片
+~~~
+app('upload')->base64ToImage($_POST['base64Img_formFiled']);
 ~~~
 
 ## 作者
