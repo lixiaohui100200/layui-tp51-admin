@@ -11,6 +11,7 @@ iAsuma/layui-tp51-admin(又名QingCMS，轻CMS) 纯净轻盈的后台管理系�
 内置扩展：
 
  + 集成微信开发SDK -- EasyWeChat（[手册传送门](https://www.easywechat.com/docs/master/overview)）
+ > 若不需要，删除composer.json中的`"overtrue/wechat": "~4.0" `
 
  使用本框架需提前准备以下环境：
 
@@ -201,6 +202,7 @@ app('upload')->base64ToImage($_POST['base64Img_formFiled']);
 
 ## 作者
 
++ Asuma (阿斯玛)
 + [微博](https://weibo.com/770878450)
 + [个人网站](http://www.udzan.com/)
 
