@@ -63,10 +63,7 @@ http://your-domain.com/admin
 
 ## other
 
-* 加载手动引入的第三方类库（如果部分引入的类库无法加载时执行）
-~~~
-composer dump-autoload
-~~~
+以下所有操作均在项目根目录`my-project`里执行
 
 * 更新Thinkphp框架（如果需要最新的thinkphp时执行）
 
@@ -82,6 +79,11 @@ git clone https://github.com/iAsuma/sms-extend.git
 * 若需要使用钉钉授权中间件
 ~~~
 git clone https://github.com/iAsuma/dingtalk-extend.git
+~~~
+
+* 加载手动引入的第三方类库（如果部分引入的类库无法加载时执行）
+~~~
+composer dump-autoload
 ~~~
 
 ## 部分功能
