@@ -11,7 +11,7 @@ iAsuma/layui-tp51-admin(又名QingCMS，轻CMS) 纯净轻盈的后台管理系�
 内置扩展：
 
  + 集成微信开发SDK -- EasyWeChat（[手册传送门](https://www.easywechat.com/docs/master/overview)）
- > 若不需要，删除composer.json中的`"overtrue/wechat": "~4.0" `
+ > 若不需要，删除composer.json中的`"overtrue/wechat": "~4.0" ` (安装前) 或 `composer remove overtrue/wechat` (安装后)
 
  使用本框架需提前准备以下环境：
 
@@ -63,10 +63,7 @@ http://your-domain.com/admin
 
 ## other
 
-* 加载手动引入的第三方类库（如果部分引入的类库无法加载时执行）
-~~~
-composer dump-autoload
-~~~
+以下所有操作均在项目根目录`my-project`里执行
 
 * 更新Thinkphp框架（如果需要最新的thinkphp时执行）
 
@@ -82,6 +79,11 @@ git clone https://github.com/iAsuma/sms-extend.git
 * 若需要使用钉钉授权中间件
 ~~~
 git clone https://github.com/iAsuma/dingtalk-extend.git
+~~~
+
+* 加载手动引入的第三方类库（如果部分引入的类库无法加载时执行）
+~~~
+composer dump-autoload
 ~~~
 
 ## 部分功能
@@ -140,6 +142,10 @@ app('upload')->move($file, false); 保留文件名
 app('upload')->move($file, 'XXX的文件'); 自定义文件名
 app('upload')->move($file, true, false); 自动生成文件名，但不覆盖同名文件
 ~~~
+base64图片编码字符串转图片
+~~~
+app('upload')->base64ToImage($_POST['base64Img_formFiled']);
+~~~
 单文件上传示例
 ~~~
 <form action="/index/index/upload" enctype="multipart/form-data" method="post">
@@ -160,7 +166,7 @@ public function upload(){
         // 输出 20190701/42a79759f284b767dfcb2a0197904287.jpg
         echo $info->getSaveName();
         // 输出 /20190701/42a79759f284b767dfcb2a0197904287.jpg
-        echo $info->savePath; //新增变量
+        **echo $info->savePath; //新增变量**
         // 输出 42a79759f284b767dfcb2a0197904287.jpg
         echo $info->getFilename(); 
     }else{
@@ -186,18 +192,12 @@ public function upload(){
         // 上传文件
         $info = app('upload')->move($file);
         if($info){
-            // 成功上传后 获取上传信息
-            // 与单文件上传相同
+            **echo $info->savePath;**
         }else{
-            // 上传失败获取错误信息
             echo $file->getError();
         }    
     }
 }
-~~~
-base64图片编码字符串转图片
-~~~
-app('upload')->base64ToImage($_POST['base64Img_formFiled']);
 ~~~
 
 ## 作者

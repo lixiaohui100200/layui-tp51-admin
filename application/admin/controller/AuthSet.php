@@ -55,7 +55,7 @@ class AuthSet extends Base
         return table_json($admin, $count);
     }
 
-    public function addadmin()
+    public function adminEdit()
     {
         if($this->request->get('id')){
             $cacheKey= md5('adminUser_'.(int)$this->request->get('id'));
@@ -498,12 +498,12 @@ class AuthSet extends Base
             ];
 
             $validate = \think\Validate::make([
-                'name' => 'require|max:20',
+                'name' => 'require|max:50',
                 'title' => 'require|max:30',
                 'remark' => 'max:200',
             ],[
                 'name.require' => '请填写规则标识',
-                'name.max'     => '规则标识最多不能超过20个字符',
+                'name.max'     => '规则标识最多不能超过50个字符',
                 'title.require'=> '请填写权限名',
                 'title.max'    => '权限名最多不能超过30个字符',
                 'remark'       => '描述最多不能超过200个字符',
